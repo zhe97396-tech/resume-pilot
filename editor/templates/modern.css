@@ -1,0 +1,113 @@
+/**
+ * modern.css — 现代简约
+ *
+ * PingFang SC 字体 + 蓝色系 + 左对齐头部 + 2px h2 底边
+ *
+ * === 快速调整指南 ===
+ * 姓名对齐：   .resume-header { text-align: left/center; }
+ * 主色调：     :root { --template-primary: #xxx; }
+ * 姓名字号：   .resume-name { font-size: 28px; }
+ * h2 字号：    .resume-page h2 { font-size: 16px; }
+ * 列表符号：   .resume-page ul { list-style-type: disc/circle/square; }
+ * 头部渐变：   .resume-header { background: linear-gradient(...); }
+ */
+
+:root {
+  --template-primary: #2563eb;     /* 标题、姓名 */
+  --template-accent: #3b82f6;      /* 强调色 */
+  --template-text: #1f2937;        /* 正文 */
+  --template-muted: #6b7280;       /* 次要文字 */
+  --template-light: #9ca3af;       /* 时间标记 */
+  --template-bg: #ffffff;          /* 底色 */
+  --template-border: #e5e7eb;      /* 边框 */
+}
+
+/* ===== 头部：左对齐 + 浅蓝渐变背景 ===== */
+.resume-header {
+  text-align: left;                        /* ← 对齐 */
+  padding: 40px 50px 30px;
+  margin-bottom: 0;
+  border-bottom: none;
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);  /* ← 渐变 */
+}
+
+.resume-name {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 28px;                         /* ← 姓名字号 */
+  font-weight: 700;
+  color: var(--template-primary);
+  letter-spacing: 0;
+  margin-bottom: 12px;
+}
+
+.resume-header-items {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 13px;                         /* ← 联系方式字号 */
+  color: var(--template-muted);
+  margin-top: 8px;
+}
+
+.resume-header-item a { color: var(--template-accent); }
+
+/* ===== 一级标题：2px 蓝底边 ===== */
+.resume-page h2 {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 16px;                         /* ← h2 字号 */
+  font-weight: 600;
+  color: var(--template-primary);
+  letter-spacing: 0;
+  margin-top: 28px; margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--template-primary);  /* ← 底线粗细 */
+}
+
+.resume-page h2:first-child { margin-top: 0; }
+
+/* ===== 二级标题 ===== */
+.resume-page h3 {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 15px;                         /* ← h3 字号 */
+  font-weight: 600;
+  color: var(--template-text);
+  margin-top: 20px; margin-bottom: 10px;
+}
+
+/* ===== 正文 ===== */
+.resume-page p {
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 14px;                         /* ← 正文字号 */
+  line-height: var(--resume-line-height, 1.5);
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 6px);
+  text-align: justify;
+}
+
+/* ===== 列表 ===== */
+.resume-page ul { list-style-type: disc; }  /* ← 符号样式 */
+.resume-page ul li { margin-bottom: 4px; }
+.resume-page ul li::marker { color: var(--template-accent); }
+.resume-page ol li::marker { font-family: 'PingFang SC', sans-serif; color: var(--template-accent); font-weight: 500; }
+
+/* ===== 强调 / 时间标记 ===== */
+.resume-page strong { font-weight: 600; color: var(--template-primary); }
+.resume-page h2:first-child { margin-top: 0; }
+.resume-page em { font-style: normal; color: var(--template-muted); }
+.resume-page h3 + p em, .resume-page h3 em {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  font-style: normal; color: var(--template-light); font-weight: 400;
+}
+
+/* ===== 链接：颜色切换动画 ===== */
+.resume-page a { color: var(--template-accent); transition: color 0.2s ease; }
+.resume-page a:hover { color: var(--template-primary); }
+
+/* ===== 代码 / 引用 ===== */
+.resume-page code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: rgba(59,130,246,0.1); color: var(--template-primary); }
+.resume-page blockquote { border-left-color: var(--template-accent); font-style: normal; }
+
+/* ===== 打印 ===== */
+@media print {
+  .resume-header { background: white; }
+  .resume-page h2 { border-bottom-color: var(--template-primary); }
+  .resume-page ul li::marker { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

@@ -1,0 +1,144 @@
+/* 页面默认字体：styles.css 的 ul/ol/li/dt/dd/blockquote/table 都用 var(--resume-font-family)，
+   不在本模板声明会让这些元素回落到 :root 的微软雅黑，与 Inter 正文不一致。
+   用 :root 而非 .resume-page，是为了让工具栏“字体”选择（内联变量）仍能覆盖它。 */
+:root {
+  --resume-font-family: 'Inter', 'Noto Sans SC', sans-serif;
+}
+
+/**
+ * gradient.css — 渐变紫粉
+ *
+ * 源自 jadeai gradient 模板
+ * 粉紫渐变头部 + 渐变下划线 + Inter 字体
+ *
+ * === 快速调整指南 ===
+ * 姓名对齐：   .resume-header { text-align: left/center; }
+ * 渐变颜色：   .resume-header { background: linear-gradient(135deg, #xxx, #xxx); }
+ *              .resume-page h2 { border-image: linear-gradient(...) 1; }
+ * 姓名字号：   .resume-name { font-size: 30px; }
+ * 姓名颜色：   .resume-name { color: #xxx; }          （当前白色，因为头部是彩色背景）
+ * h2 字号：    .resume-page h2 { font-size: 14px; }
+ * 正文字号：   .resume-page p { font-size: 14px; }
+ */
+
+/* ===== 颜色变量 ===== */
+:root {
+  --template-primary: #a855f7;     /* 紫色（h2 文字色） */
+  --template-accent: #ec4899;      /* 粉色（强调） */
+  --template-text: #334155;        /* 正文颜色 */
+  --template-muted: #64748b;       /* 次要文字 */
+  --template-light: #94a3b8;       /* 更淡文字 */
+  --template-bg: #ffffff;          /* 页面底色 */
+  --template-border: #e2e8f0;      /* 边框 */
+}
+
+/* ===== 页面基底 ===== */
+.resume-page {
+  background: var(--template-bg);
+  color: var(--template-text);
+  font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  text-align: justify;
+}
+
+/* ===== 头部：粉紫渐变背景 ===== */
+.resume-header {
+  text-align: left;                        /* ← 改 left/center 切换对齐 */
+  padding: 40px 50px 30px;
+  margin-bottom: 0;
+  border-bottom: none;
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);  /* ← 渐变：粉色→紫色 */
+  color: #ffffff;
+  position: relative;
+}
+
+/* 头部底部的渐变线 */
+.resume-header::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #ec4899 0%, #8b5cf6 50%, transparent 100%);
+}
+
+.resume-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 30px;                         /* ← 姓名字号 */
+  font-weight: 700;
+  color: #ffffff;                          /* 白色（渐变背景上必须浅色） */
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.resume-header-items {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;                         /* ← 联系方式字号 */
+  color: rgba(255, 255, 255, 0.85);        /* 半透明白色 */
+  margin-top: 8px;
+}
+
+.resume-header-item a { color: #ffffff; }
+.resume-header-item:not(.no-separator)::after { color: rgba(255, 255, 255, 0.5); }
+
+/* ===== 一级标题：紫色 + 渐变底线 ===== */
+.resume-page h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;                         /* ← h2 字号 */
+  font-weight: 700;
+  color: var(--template-primary);          /* 紫色 */
+  text-transform: uppercase;               /* 强制大写 */
+  letter-spacing: 0.05em;                 /* ← 字间距 */
+  margin-top: 24px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) 1;  /* ← 渐变下划线 */
+}
+
+/* ===== 二级标题 ===== */
+.resume-page h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;                         /* ← h3 字号 */
+  font-weight: 600;
+  color: #475569;
+  margin-top: 16px; margin-bottom: 8px;
+}
+
+/* ===== 正文 ===== */
+.resume-page p {
+  font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  font-size: 14px;                         /* ← 正文字号 */
+  line-height: var(--resume-line-height, 1.5);
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+}
+
+/* ===== 列表 ===== */
+.resume-page ul {
+  list-style-type: disc;                   /* ← 符号样式 */
+  padding-left: 1.5em;
+}
+.resume-page ul li::marker { color: var(--template-primary); }
+.resume-page ol { list-style-type: decimal; }
+.resume-page li { margin-bottom: 2px; }
+
+/* ===== 强调 / 链接 / 代码 / 引用 ===== */
+.resume-page strong { font-weight: 600; color: #475569; }
+.resume-page em { font-style: italic; color: var(--template-muted); }
+.resume-page a { color: var(--template-primary); text-decoration: none; }
+.resume-page a:hover { color: var(--template-accent); }
+.resume-page code {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.9em;
+  background: rgba(168, 85, 247, 0.08); color: var(--template-primary);
+  padding: 2px 6px; border-radius: 3px;
+}
+.resume-page blockquote {
+  border-left: 3px solid var(--template-primary); padding-left: 16px;
+  margin: 8px 0; color: var(--template-muted);
+}
+
+/* ===== 打印：保留渐变 ===== */
+@media print {
+  .resume-page * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .resume-header { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important; }
+  .resume-page { background: white !important; }
+  .resume-page h2 { border-bottom-color: var(--template-primary); }
+}

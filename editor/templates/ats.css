@@ -1,0 +1,107 @@
+/**
+ * ats.css — ATS 机器友好
+ *
+ * 源自 resume-pdf-generator ats 模板
+ * 单列无装饰，纯文本结构，适合 ATS 系统解析
+ *
+ * === 快速调整 ===
+ * 姓名对齐：   .resume-header { text-align: center/left; }
+ * 主色：       :root { --template-primary: #xxx; }
+ */
+
+:root {
+  --template-primary: #333333;
+  --template-accent: #666666;
+  --template-text: #333333;
+  --template-muted: #888888;
+  --template-light: #aaaaaa;
+  --template-bg: #ffffff;
+  --template-border: #e0e0e0;
+}
+
+.resume-page {
+  background: var(--template-bg);
+  color: var(--template-text);
+  font-family: 'Microsoft YaHei', sans-serif;
+}
+
+/* 头部：居中 + 粗底线 */
+.resume-header {
+  text-align: center;              /* ← 对齐 */
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--template-primary);
+  margin-bottom: 20px;
+  background: transparent;
+}
+
+.resume-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--template-primary);
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+
+.resume-header-items {
+  font-size: 14px;
+  color: var(--template-muted);
+  margin-top: 4px;
+}
+
+/* h2：粗体 + 细底线 */
+.resume-page h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--template-primary);
+  margin-top: 20px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--template-border);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.resume-page h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--template-primary);
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+/* 正文 */
+.resume-page p {
+  font-size: var(--resume-font-size, 14px);
+  line-height: var(--resume-line-height, 1.5);
+  color: #444;
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+}
+
+/* 列表 */
+.resume-page ul { list-style-type: disc; padding-left: 1.5em; }
+.resume-page ol { list-style-type: decimal; }
+.resume-page li { color: #555; margin-bottom: 2px; }
+
+/* 强调 */
+.resume-page strong { font-weight: 600; color: var(--template-primary); }
+.resume-page em { font-style: italic; color: var(--template-muted); }
+
+/* 链接 */
+.resume-page a { color: var(--template-accent); text-decoration: none; }
+.resume-page a:hover { text-decoration: underline; }
+
+/* 代码 */
+.resume-page code {
+  font-family: 'Consolas', monospace; font-size: 0.9em;
+  background: #f5f5f5; padding: 2px 6px; border-radius: 2px;
+}
+
+/* 引用 */
+.resume-page blockquote {
+  border-left: 3px solid var(--template-border); padding-left: 16px;
+  margin: 8px 0; color: var(--template-muted);
+}
+
+@media print {
+  .resume-page { background: white !important; }
+}

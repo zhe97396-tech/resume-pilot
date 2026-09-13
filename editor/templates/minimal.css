@@ -1,0 +1,112 @@
+/**
+ * minimal.css — 极简清爽
+ *
+ * Helvetica 字体 + 300 字重 + uppercase h2 + 负 letter-spacing
+ * 适合设计师、创意行业
+ *
+ * === 快速调整指南 ===
+ * 姓名对齐：   .resume-header { text-align: left/center; }
+ * 主色调：     :root { --template-primary: #xxx; }
+ * 字重：       .resume-page p { font-weight: 300; }   300轻/400正常/700粗
+ *             .resume-name { font-weight: 300; }
+ * 姓名字号：   .resume-name { font-size: 32px; }
+ * h2 字号：    .resume-page h2 { font-size: 11px; }
+ * h2 大写：    .resume-page h2 { text-transform: uppercase/none; }
+ * 字间距：     .resume-name { letter-spacing: -1px; }  负值紧凑
+ */
+
+:root {
+  --template-primary: #000000;     /* 标题、姓名 */
+  --template-accent: #666666;      /* 强调色 */
+  --template-text: #333333;        /* 正文 */
+  --template-muted: #666666;       /* 次要文字 */
+  --template-light: #999999;       /* 时间标记 */
+  --template-bg: #ffffff;          /* 底色 */
+  --template-border: #eeeeee;      /* 链接下划线 */
+}
+
+/* ===== 头部：左对齐 + 无边框 ===== */
+.resume-header {
+  text-align: left;                /* ← 对齐 */
+  padding: 50px 70px 30px;
+  margin-bottom: 0;
+  border-bottom: none;
+  background: transparent;
+}
+
+.resume-name {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 32px;                 /* ← 姓名字号 */
+  font-weight: 300;                /* ← 字重：300 极轻 */
+  color: var(--template-primary);
+  letter-spacing: -1px;           /* ← 字间距：负值紧凑 */
+  margin-bottom: 16px;
+}
+
+.resume-header-items {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 13px;                 /* ← 联系方式字号 */
+  color: var(--template-muted);
+  margin-top: 12px;
+  font-weight: 300;
+}
+
+/* ===== 一级标题：极小 + 大写 + 无底线 ===== */
+.resume-page h2 {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 11px;                 /* ← h2 字号（最小） */
+  font-weight: 500;
+  color: var(--template-muted);    /* 灰色而非主色 */
+  letter-spacing: 2px;            /* ← 字间距 */
+  text-transform: uppercase;       /* 强制大写 */
+  margin-top: 32px; margin-bottom: 16px;
+  padding-bottom: 0;
+  border-bottom: none;             /* 无底线（唯一） */
+}
+
+.resume-page h2:first-child { margin-top: 0; }
+
+/* ===== 二级标题 ===== */
+.resume-page h3 {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 15px;                 /* ← h3 字号 */
+  font-weight: 500;
+  color: var(--template-primary);
+  margin-top: 20px; margin-bottom: 8px;
+}
+
+/* ===== 正文：左对齐 + 300 字重 ===== */
+.resume-page p {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 14px;                 /* ← 正文字号 */
+  line-height: var(--resume-line-height, 1.5);
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 6px);
+  text-align: left;                /* 左对齐（非两端对齐） */
+  font-weight: 300;                /* ← 字重 */
+}
+
+/* ===== 列表 ===== */
+.resume-page ul { list-style-type: disc; }  /* ← 符号样式 */
+.resume-page ul li { margin-bottom: 4px; }
+.resume-page ul li::marker { color: var(--template-accent); }
+.resume-page ol li::marker { font-family: 'Helvetica Neue', sans-serif; color: var(--template-accent); font-weight: 300; }
+
+/* ===== 强调 / 时间标记 ===== */
+.resume-page strong { font-weight: 500; color: var(--template-primary); }
+.resume-page h2:first-child { margin-top: 0; }
+.resume-page h3 + p em, .resume-page h3 em {
+  font-family: 'Helvetica Neue', sans-serif; font-size: 12px;
+  font-style: normal; color: var(--template-light); font-weight: 300;
+}
+
+/* ===== 链接：底部边框动画 ===== */
+.resume-page a { color: var(--template-primary); border-bottom: 1px solid var(--template-border); transition: border-color 0.2s ease; }
+.resume-page a:hover { border-bottom-color: var(--template-primary); }
+
+/* ===== 代码 / 引用 ===== */
+.resume-page code { font-family: 'SF Mono', 'Monaco', monospace; font-size: 12px; background: #fafafa; border-radius: 2px; color: var(--template-text); }
+.resume-page blockquote { border-left-width: 2px; border-left-color: var(--template-border); font-style: italic; }
+
+/* ===== 打印 ===== */
+@media print { .resume-header { background: white; } }

@@ -1,0 +1,159 @@
+/**
+ * official.css — 官方默认（Oh My CV backbone）
+ *
+ * 移植自 Oh My CV DEFAULT_CSS_CONTENT
+ * Black #000000 + 微软雅黑 + 1px h2 底线 + circle 列表
+ *
+ * === 快速调整指南 ===
+ * 姓名对齐：   .resume-header { text-align: center; }
+ * 主色调：     :root { --template-primary: #xxx; }
+ * 姓名字号：   .resume-name { font-size: 2.13em; }
+ * h2 字号：    .resume-page h2 { font-size: 1.05em; }
+ * h3 字号：    .resume-page h3 { font-size: 1em; }
+ * 列表符号：   .resume-page ul { list-style-type: circle/disc/square; }
+ * 正文字号：   .resume-page p { font-size: 15px; }
+ */
+
+/* ===== 颜色变量 ===== */
+:root {
+  --template-primary: #000000;   /* 标题、姓名、粗体、链接 */
+  --template-accent: #000000;    /* 强调色 */
+  --template-text: #000000;      /* 正文颜色 */
+  --template-muted: #333333;     /* 次要文字 */
+  --template-light: #666666;     /* 更淡文字 */
+  --template-bg: #ffffff;        /* 页面底色 */
+  --template-border: #000000;    /* h2 底线颜色 */
+}
+
+/* ===== 页面基底 ===== */
+.resume-page {
+  text-align: justify;
+  -moz-hyphens: auto; -ms-hyphens: auto; -webkit-hyphens: auto; hyphens: auto;  /* 自动断词 */
+}
+
+/* ===== 头部：居中姓名 ===== */
+.resume-header {
+  text-align: center;              /* ← 改 left/center 切换对齐 */
+}
+
+.resume-header h1 {
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.resume-name {
+  font-size: 2.13em;               /* ← 姓名字号（相对正文的比例） */
+  font-weight: bold;
+  color: var(--template-primary);
+  margin-bottom: 8px;              /* 姓名与联系方式间距 */
+}
+
+.resume-header-items {
+  font-size: var(--resume-font-size, 15px);  /* 联系方式字号 */
+  color: var(--template-muted);
+  margin-top: 8px;
+}
+
+.resume-header-item a {
+  color: var(--template-primary);
+}
+
+.resume-header-item:not(.no-separator)::after {
+  content: " | ";                  /* 联系方式分隔符 */
+}
+
+.resume-header-item:last-child::after {
+  display: none;
+}
+
+/* ===== 标题 ===== */
+.resume-page h1, .resume-page h2 {
+  font-weight: bold;
+  color: var(--template-primary);
+}
+
+.resume-page h3 {
+  font-weight: 400;
+}
+
+.resume-page h1 { font-size: 2.13em; }
+
+.resume-page h2 {
+  margin-bottom: 5px;
+  font-size: 1.05em;               /* ← h2 字号 */
+}
+
+.resume-page h3 {
+  margin-bottom: 5px;
+  font-size: 1em;                  /* ← h3 字号（比 h2 小一档） */
+  color: var(--template-muted);
+}
+
+.resume-page h2 {
+  border-bottom: 1px solid var(--template-primary);  /* h2 底线 */
+  margin-top: var(--resume-paragraph-spacing, 5px);
+}
+
+/* ===== 正文 ===== */
+.resume-page p {
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.3);
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+}
+
+/* ===== 列表 ===== */
+.resume-page ul, .resume-page ol {
+  padding-left: 1.5em;
+  margin: 0.2em 0;
+}
+
+.resume-page ul { list-style-type: circle; }   /* ← 符号样式 */
+.resume-page ol { list-style-type: decimal; }
+
+.resume-page li {
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.3);
+}
+
+/* ===== 定义列表 ===== */
+.resume-page dl {
+  display: flex;
+  line-height: calc(var(--resume-line-height, 1.3) * 1.038);
+}
+
+.resume-page dl dt, .resume-page dl dd:not(:last-child) { flex: 1; }
+
+.resume-page dt { font-weight: 500; color: var(--template-muted); }
+.resume-page dd { color: var(--template-text); margin-left: 0; }
+
+/* ===== 强调 ===== */
+.resume-page strong { font-weight: 600; color: var(--template-primary); }
+.resume-page em { font-style: italic; color: var(--template-muted); }
+
+/* ===== 链接 ===== */
+.resume-page a { color: var(--template-primary); text-decoration: none; }
+.resume-page a:hover { text-decoration: underline; }
+
+/* ===== 代码 / 引用 / 图片 ===== */
+.resume-page code {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 0.9em; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px;
+}
+.resume-page blockquote {
+  border-left: 3px solid var(--template-primary); padding-left: 16px;
+  margin: 8px 0; color: var(--template-muted); font-style: italic;
+}
+
+/* cross-ref 交叉引用（学术简历用） */
+.resume-page [data-scope="cross-ref"][data-part="definitions"] { padding-left: 1.2em; }
+.resume-page [data-scope="cross-ref"][data-part="definition"] p { margin-left: 0.5em; }
+.resume-page [data-scope="cross-ref"][data-part="definition"]::marker { content: attr(data-label); }
+.resume-page [data-scope="cross-ref"][data-part="reference"] { font-size: 100%; top: 0; }
+
+/* ===== 打印 ===== */
+@media print {
+  .resume-page h2 { border-bottom-color: var(--template-primary); }
+  .resume-page ul li::marker { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

@@ -1,0 +1,112 @@
+/**
+ * clean.css — 清爽干净
+ *
+ * 源自 resume-pdf-generator clean 模板
+ * 深蓝灰色调 + 2px 头部底线 + 左对齐姓名
+ * 借鉴 CyC2018/Markdown-Resume 排版
+ *
+ * === 快速调整 ===
+ * 姓名对齐：   .resume-header { text-align: left/center; }
+ * 主色：       :root { --template-primary: #xxx; }   深蓝灰
+ * 强调色：     :root { --template-accent: #xxx; }    蓝
+ */
+
+:root {
+  --template-primary: #1a2a3a;     /* 深蓝灰 */
+  --template-accent: #2c5f8a;      /* 蓝 */
+  --template-text: #1a2a3a;
+  --template-muted: #5a6a7a;
+  --template-light: #8a9aaa;
+  --template-bg: #ffffff;
+  --template-border: #dde3e8;
+}
+
+.resume-page {
+  background: var(--template-bg);
+  color: var(--template-text);
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 头部：左对齐 + 粗底线 */
+.resume-header {
+  text-align: left;                /* ← 对齐 */
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--template-primary);
+  background: transparent;
+}
+
+.resume-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--template-primary);
+  margin-bottom: 4px;
+}
+
+.resume-header-items {
+  font-size: 13px;
+  color: var(--template-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 4px;
+}
+
+/* h2：细底线 + 字间距 */
+.resume-page h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--template-primary);
+  letter-spacing: 1px;
+  margin-top: 20px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--template-border);
+}
+
+.resume-page h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--template-primary);
+  margin-top: 14px;
+  margin-bottom: 6px;
+}
+
+/* 正文 */
+.resume-page p {
+  font-size: var(--resume-font-size, 14px);
+  line-height: var(--resume-line-height, 1.5);
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+}
+
+/* 列表 */
+.resume-page ul { list-style-type: disc; padding-left: 1.5em; }
+.resume-page ol { list-style-type: decimal; }
+.resume-page li { color: var(--template-text); margin-bottom: 2px; }
+
+/* 强调 */
+.resume-page strong { font-weight: 600; color: var(--template-primary); }
+.resume-page em { font-style: italic; color: var(--template-muted); }
+
+/* 链接 */
+.resume-page a { color: var(--template-accent); text-decoration: none; }
+.resume-page a:hover { text-decoration: underline; }
+
+/* 代码 */
+.resume-page code {
+  font-family: 'Consolas', monospace; font-size: 0.9em;
+  background: #f5f7f9; padding: 2px 6px; border-radius: 2px;
+}
+
+/* 引用 */
+.resume-page blockquote {
+  border-left: 3px solid var(--template-accent); padding-left: 16px;
+  margin: 8px 0; color: var(--template-muted);
+}
+
+@media print {
+  .resume-page { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

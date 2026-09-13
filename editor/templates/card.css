@@ -1,0 +1,145 @@
+/* 页面默认字体：styles.css 的 ul/ol/li/dt/dd/blockquote/table 都用 var(--resume-font-family)，
+   不在本模板声明会让这些元素回落到 :root 的微软雅黑，与 Inter 正文不一致。
+   用 :root 而非 .resume-page，是为了让工具栏“字体”选择（内联变量）仍能覆盖它。 */
+:root {
+  --resume-font-family: 'Inter', 'Noto Sans SC', sans-serif;
+}
+
+/**
+ * card.css — 卡片轻量
+ *
+ * 源自 jadeai card 模板
+ * 居中姓名 + Indigo 竖线 pill + 卡片式块引用
+ *
+ * === 快速调整指南 ===
+ * 姓名对齐：   .resume-header { text-align: center; }
+ * 主色调：     :root { --template-primary: #xxx; }       标题、姓名
+ * 强调色：     :root { --template-accent: #xxx; }        h2 pill、链接、符号
+ * 姓名字号：   .resume-name { font-size: 26px; }
+ * h2 字号：    .resume-page h2 { font-size: 14px; }
+ * pill 宽度：   .resume-page h2::before { width: 3px; }
+ */
+
+/* ===== 颜色变量 ===== */
+:root {
+  --template-primary: #18181b;     /* 标题、姓名 */
+  --template-accent: #6366f1;      /* Indigo 强调色 */
+  --template-text: #3f3f46;        /* 正文颜色 */
+  --template-muted: #71717a;       /* 次要文字 */
+  --template-light: #a1a1aa;       /* 更淡文字 */
+  --template-bg: #ffffff;          /* 页面底色 */
+  --template-border: #e4e4e7;      /* 边框 */
+}
+
+/* ===== 页面基底 ===== */
+.resume-page {
+  background: var(--template-bg);
+  color: var(--template-text);
+  font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  text-align: justify;
+}
+
+/* ===== 头部：居中简洁 ===== */
+.resume-header {
+  text-align: center;              /* 居中 */
+  padding: 32px 0 12px;
+  margin-bottom: 20px;
+  background: transparent;
+  border-bottom: none;             /* 无底线，干净 */
+}
+
+.resume-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 26px;                 /* ← 姓名字号 */
+  font-weight: 700;
+  color: var(--template-primary);
+  margin-bottom: 8px;
+}
+
+.resume-header-items {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;                 /* ← 联系方式字号 */
+  color: var(--template-muted);
+  margin-top: 6px;
+}
+
+.resume-header-item a { color: var(--template-accent); }
+
+/* ===== 一级标题：Indigo 竖线 pill + 底部分隔线 ===== */
+.resume-page h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;                 /* ← h2 字号 */
+  font-weight: 700;
+  color: var(--template-primary);
+  text-transform: uppercase;       /* 强制大写 */
+  letter-spacing: 0.05em;         /* ← 字间距 */
+  margin-top: 24px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  padding-left: 12px;             /* 为 pill 留空 */
+  border-bottom: 1px solid var(--template-border);
+  position: relative;
+}
+
+/* h2 左侧 Indigo 竖线 */
+.resume-page h2::before {
+  content: '';
+  position: absolute; left: 0; top: 2px; bottom: 2px;
+  width: 3px;                      /* ← pill 宽度 */
+  border-radius: 2px;              /* ← pill 圆角 */
+  background: var(--template-accent);
+}
+
+/* ===== 二级标题 ===== */
+.resume-page h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;                 /* ← h3 字号 */
+  font-weight: 600;
+  color: var(--template-primary);
+  margin-top: 14px; margin-bottom: 8px;
+}
+
+/* ===== 正文 ===== */
+.resume-page p {
+  font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  font-size: 14px;                 /* ← 正文字号 */
+  line-height: var(--resume-line-height, 1.5);
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+}
+
+/* ===== 列表 ===== */
+.resume-page ul {
+  list-style-type: disc;           /* ← 符号样式 */
+  padding-left: 1.5em;
+}
+.resume-page ul li::marker { color: var(--template-accent); }
+.resume-page ol { list-style-type: decimal; }
+.resume-page li { margin-bottom: 2px; }
+
+/* ===== 强调 / 链接 ===== */
+.resume-page strong { font-weight: 600; color: var(--template-primary); }
+.resume-page em { font-style: italic; color: var(--template-muted); }
+.resume-page a { color: var(--template-accent); text-decoration: none; }
+.resume-page a:hover { text-decoration: underline; }
+
+/* ===== 代码 ===== */
+.resume-page code {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.9em;
+  background: #f4f4f5; padding: 2px 6px; border-radius: 4px;
+}
+
+/* ===== 引用：卡片样式 ===== */
+.resume-page blockquote {
+  border-left: 3px solid var(--template-accent);
+  padding: 12px 16px;              /* 卡片内边距 */
+  margin: 8px 0;
+  background: #fafafa;             /* 卡片底色 */
+  border-radius: 0 4px 4px 0;      /* 右侧圆角 */
+  color: var(--template-muted);
+}
+
+/* ===== 打印 ===== */
+@media print {
+  .resume-page { background: white !important; }
+}

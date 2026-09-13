@@ -1,0 +1,123 @@
+/**
+ * _base.css — 所有模板共享的结构骨架
+ *
+ * 只包含：
+ * 1. 页面容器外观（纸张阴影、A4 尺寸）
+ * 2. 分页布局（resume-pages）
+ * 3. 打印分页（@page、break-before）
+ * 4. 最小 reset（p/li/dl margin:0）
+ *
+ * 排版规则（字体、字号、颜色、列表符号、间距）由各模板独立控制。
+ */
+
+/* ================================================================
+   页面结构
+   ================================================================ */
+
+.resume-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 20px 0;
+  min-width: fit-content;
+}
+
+.resume-page {
+  background: var(--template-bg, #ffffff);
+  color: var(--template-text, #000000);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 20px 40px -10px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  border-radius: 2px;
+  flex-shrink: 0;
+  width: var(--resume-page-width, 210mm);
+  min-height: var(--resume-page-height, 297mm);
+  padding: var(--resume-margin-top, 50px) var(--resume-margin-right, 45px)
+           var(--resume-margin-bottom, 40px) var(--resume-margin-left, 45px);
+  box-sizing: border-box;
+}
+
+.resume-page:hover {
+  box-shadow:
+    0 6px 10px -1px rgba(0, 0, 0, 0.15),
+    0 25px 50px -10px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* ================================================================
+   共享 reset 和通用排版（所有 5 个模板完全一致的规则）
+   ================================================================ */
+
+.resume-page p,
+.resume-page li,
+.resume-page dl {
+  margin: 0;
+}
+
+/* 列表：padding-left 和 ol 类型在所有模板中一致 */
+.resume-page ul,
+.resume-page ol {
+  padding-left: 1.5em;
+  margin: 0.2em 0;
+}
+
+.resume-page ol {
+  list-style-type: decimal;
+}
+
+/* 媒体 */
+.resume-page img {
+  max-width: 100%;
+}
+
+/* 简历照片：默认右上角1寸长方形（25mm×35mm），各模板可覆盖位置/大小/形状 */
+.resume-photo {
+  display: var(--photo-display, block);
+  width: 16mm;
+  height: 22mm;
+  object-fit: cover;
+  border-radius: 4px;
+  float: right;
+  margin-left: 16px;
+  margin-bottom: 8px;
+  margin-top: -6px;
+}
+
+.resume-page svg.iconify {
+  vertical-align: -0.2em;
+}
+
+/* ================================================================
+   打印分页
+   ================================================================ */
+
+@media print {
+  @page {
+    margin: 0;
+    size: A4;
+  }
+
+  .resume-pages {
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+
+  .resume-page {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: white;             /* 默认白色（暗色模板可覆盖） */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: 100vh !important;
+    break-before: page;
+    break-inside: avoid;
+    overflow: hidden;
+  }
+
+  .resume-page:first-child {
+    break-before: auto;
+  }
+}

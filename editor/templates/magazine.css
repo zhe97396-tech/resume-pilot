@@ -1,0 +1,189 @@
+/* 页面默认字体：styles.css 的 ul/ol/li/dt/dd/blockquote/table 都用 var(--resume-font-family)，
+   不在本模板声明会让这些元素回落到 :root 的微软雅黑，与 衬线正文不一致。
+   用 :root 而非 .resume-page，是为了让工具栏“字体”选择（内联变量）仍能覆盖它。 */
+:root {
+  --resume-font-family: 'Georgia', 'Noto Serif SC', serif;
+}
+
+/**
+ * magazine.css — 杂志衬线
+ *
+ * 源自 jadeai magazine 模板
+ * Georgia 衬线字体 + 红色 accent + 超大超粗姓名
+ *
+ * === 快速调整指南 ===
+ * 姓名对齐：   .resume-header { text-align: left/center; }
+ * 主色调：     :root { --template-primary: #xxx; }       标题、姓名、粗体颜色
+ * 强调色：     :root { --template-accent: #xxx; }         h2 方块、链接、列表符号
+ * 正文字色：   :root { --template-text: #xxx; }
+ * 页面底色：   :root { --template-bg: #xxx; }
+ * 姓名字号：   .resume-name { font-size: 38px; }
+ * h2 字号：    .resume-page h2 { font-size: 14px; }
+ * h3 字号：    .resume-page h3 { font-size: 16px; }
+ * 正文字号：   .resume-page p { font-size: 14px; }
+ * 列表符号：   .resume-page ul { list-style-type: disc/circle/square; }
+ */
+
+/* ===== 颜色变量 ===== */
+:root {
+  --template-primary: #1a1a1a;   /* 标题、姓名、粗体 */
+  --template-accent: #dc2626;    /* 强调色：h2 方块、链接、符号 */
+  --template-text: #333333;      /* 正文颜色 */
+  --template-muted: #666666;     /* 次要文字（联系方式、em、引用） */
+  --template-light: #999999;     /* 更淡的文字 */
+  --template-bg: #ffffff;        /* 页面底色 */
+  --template-border: #e5e5e5;    /* 边框/分隔线颜色 */
+}
+
+/* ===== 页面基底 ===== */
+.resume-page {
+  background: var(--template-bg);        /* 页面底色 */
+  color: var(--template-text);           /* 默认文字色 */
+  font-family: 'Georgia', 'Noto Serif SC', serif;  /* 全局字体 */
+  text-align: justify;                   /* 正文两端对齐 */
+}
+
+/* ===== 头部：姓名 + 联系方式 ===== */
+.resume-header {
+  text-align: left;                      /* ← 改 left/center 切换对齐 */
+  padding: 0 0 16px 0;                  /* 头部内边距 */
+  margin-bottom: 16px;                   /* 与下方内容的间距 */
+  border-bottom: 2px solid var(--template-accent);  /* 底部红色粗线 */
+  background: transparent;               /* 头部背景（可改颜色/渐变） */
+}
+
+.resume-name {
+  font-family: 'Georgia', serif;         /* 姓名字体 */
+  font-size: 38px;                       /* ← 姓名字号 */
+  font-weight: 900;                      /* ← 姓名粗细：300轻/400正常/700粗/900超粗 */
+  color: var(--template-primary);        /* 姓名颜色 */
+  text-transform: uppercase;             /* 强制大写；删掉则保留原文大小写 */
+  letter-spacing: -0.02em;              /* ← 字间距：负值紧凑/正值松散 */
+  margin-bottom: 4px;                   /* 姓名与联系方式间距 */
+}
+
+.resume-header-items {
+  font-family: 'Georgia', serif;         /* 联系方式字体 */
+  font-size: 13px;                       /* ← 联系方式字号 */
+  color: var(--template-muted);          /* 联系方式颜色 */
+  margin-top: 8px;
+}
+
+.resume-header-item a {
+  color: var(--template-primary);        /* 联系方式中的链接颜色 */
+}
+
+/* ===== 一级标题（工作经历、教育背景等） ===== */
+.resume-page h2 {
+  font-family: 'Georgia', serif;
+  font-size: 14px;                       /* ← h2 字号 */
+  font-weight: 800;                      /* h2 粗细 */
+  color: var(--template-primary);        /* h2 文字色 */
+  text-transform: uppercase;             /* 强制大写 */
+  letter-spacing: 0.2em;                /* ← 字间距 */
+  margin-top: 20px;                      /* 与上方元素间距 */
+  margin-bottom: 12px;                   /* 与下方元素间距 */
+  padding-bottom: 8px;
+  border-bottom: none;                   /* 去掉默认底线（改用 ::after） */
+}
+
+/* h2 前的红色方块 */
+.resume-page h2::before {
+  content: '';
+  display: inline-block;
+  width: 14px;                           /* ← 方块尺寸 */
+  height: 14px;
+  background: var(--template-accent);    /* 方块颜色 */
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* h2 下的细分隔线 */
+.resume-page h2::after {
+  content: '';
+  display: block;
+  height: 1px;                           /* ← 线粗细 */
+  background: var(--template-border);    /* 线颜色 */
+  margin-top: 6px;
+}
+
+/* ===== 二级标题（公司名/职位） ===== */
+.resume-page h3 {
+  font-family: 'Georgia', serif;
+  font-size: 16px;                       /* ← h3 字号 */
+  font-weight: 700;                      /* h3 粗细 */
+  color: var(--template-primary);
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+/* ===== 正文段落 ===== */
+.resume-page p {
+  font-family: 'Georgia', 'Noto Serif SC', serif;
+  font-size: 14px;                       /* ← 正文字号 */
+  line-height: var(--resume-line-height, 1.5);  /* 行高（工具栏可调） */
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 5px);  /* 段距（工具栏可调） */
+}
+
+/* ===== 列表 ===== */
+.resume-page ul {
+  list-style-type: disc;                 /* ← 符号：disc●/circle○/square■/none无 */
+  padding-left: 1.5em;                   /* 列表缩进 */
+}
+
+.resume-page ul li::marker {
+  color: var(--template-accent);         /* 列表符号颜色 */
+}
+
+.resume-page ol {
+  list-style-type: decimal;              /* 有序列表：decimal/upper-alpha/lower-roman */
+}
+
+.resume-page li {
+  margin-bottom: 2px;                    /* 列表项间距 */
+}
+
+/* ===== 粗体 / 斜体 ===== */
+.resume-page strong {
+  font-weight: 700;                      /* 粗体粗细 */
+  color: var(--template-primary);        /* 粗体颜色 */
+}
+
+.resume-page em {
+  font-style: italic;                    /* 斜体样式：italic斜/normal正常 */
+  color: var(--template-muted);
+}
+
+/* ===== 链接 ===== */
+.resume-page a {
+  color: var(--template-accent);         /* 链接颜色 */
+  text-decoration: none;                 /* 去掉默认下划线 */
+  border-bottom: 1px solid transparent;  /* 隐形下划线（hover 显示） */
+}
+
+.resume-page a:hover {
+  border-bottom-color: var(--template-accent);  /* 悬停时显示下划线 */
+}
+
+/* ===== 行内代码 ===== */
+.resume-page code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  background: #f5f5f5;                   /* 代码底色 */
+  padding: 2px 6px;
+}
+
+/* ===== 引用块 ===== */
+.resume-page blockquote {
+  border-left: 3px solid var(--template-accent);  /* 左侧强调线 */
+  padding-left: 16px;
+  margin: 8px 0;
+  font-style: italic;
+  color: var(--template-muted);
+}
+
+/* ===== 打印 ===== */
+@media print {
+  .resume-page { background: white !important; }
+}

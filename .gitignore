@@ -1,0 +1,33 @@
+# ============================================================
+# .gitignore（公开版）
+#
+# ⚠️ 本文件保护你的个人数据：init_data.py 生成的以下文件会被忽略，
+#    不会误提交到仓库。请勿删除本文件中的「用户数据」段。
+# ============================================================
+
+# ── 用户数据（init_data.py 生成，含真实信息，务必忽略）──
+config/profile.yml
+references/project-library.md
+references/interview-story-bank.md
+references/interview-question-bank.md
+ENVIRONMENT.md
+
+# ── 生成产物 ──
+output/
+*.docx
+*.pdf
+
+# 照片（个人隐私）
+config/photo.jpg
+
+# ── Python ──
+__pycache__/
+*.pyc
+
+# ── 系统文件 ──
+Thumbs.db
+.DS_Store
+
+# ── 其他 ──
+dist/
+server.log

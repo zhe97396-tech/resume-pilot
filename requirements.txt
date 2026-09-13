@@ -1,0 +1,5 @@
+# resume-pilot 依赖（极简）
+# 渲染器与本地服务均基于 Python 标准库，仅需 PyYAML 解析 profile.yml
+PyYAML>=6.0
+# 可选：仅 `scripts/set_photo.py` 压缩照片时需要（不装则用 --no-compress 原样拷贝）
+# Pillow>=10.0

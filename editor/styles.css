@@ -1,0 +1,332 @@
+/**
+ * styles.css - Markdown 简历编辑器样式
+ *
+ * Editorial/Refined 风格 - 精致的简历排版
+ */
+
+/* === 简历头部样式 === */
+.resume-header {
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.resume-name {
+  font-family: var(--resume-font-family);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--resume-primary-color);
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+
+.resume-header-items {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #666;
+}
+
+.resume-header-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.resume-header-item:not(.no-separator)::after {
+  content: '·';
+  margin-left: 8px;
+  color: #999;
+}
+
+/* 最后一个 header item 不显示分隔符 */
+.resume-header-item:last-child::after {
+  display: none;
+}
+
+.resume-header-item a {
+  color: var(--resume-accent-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.resume-header-item a:hover {
+  color: var(--resume-primary-color);
+}
+
+/* === 标题层级（参考 Oh My CV 紧凑间距） === */
+.resume-page h2 {
+  font-family: var(--resume-font-family);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--resume-primary-color);
+  margin-top: 16px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--resume-accent-color);
+  letter-spacing: 1px;
+}
+
+.resume-page h2:first-child {
+  margin-top: 0;
+}
+
+.resume-page h3 {
+  font-family: var(--resume-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  color: #333;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+
+.resume-page h4 {
+  font-family: var(--resume-font-family);
+  font-size: 14px;
+  font-weight: 500;
+  color: #444;
+  margin-top: 8px;
+  margin-bottom: 6px;
+}
+
+/* === 正文样式（参考 Oh My CV 紧凑间距） === */
+.resume-page p {
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+  line-height: var(--resume-line-height);
+  color: #333;
+  margin-bottom: var(--resume-paragraph-spacing, 6px);
+  text-align: justify;
+}
+
+.resume-page ul,
+.resume-page ol {
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+  line-height: var(--resume-line-height);
+  color: #333;
+  margin-bottom: var(--resume-paragraph-spacing, 6px);
+  padding-left: 1.5em;
+  margin-top: 0.2em;
+}
+
+/* 列表样式 - 使用 CSS 原生（参考 Oh My CV: circle） */
+.resume-page ul {
+  list-style-type: circle;
+}
+
+.resume-page ol {
+  list-style-type: decimal;
+}
+
+.resume-page li {
+  margin-bottom: 2px;
+}
+
+.resume-page li::marker {
+  color: var(--resume-accent-color);
+}
+
+/* === 强调样式 === */
+.resume-page strong {
+  font-weight: 600;
+  color: var(--resume-primary-color);
+}
+
+.resume-page em {
+  font-style: italic;
+  color: #555;
+}
+
+.resume-page a {
+  color: var(--resume-accent-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.resume-page a:hover {
+  border-bottom-color: var(--resume-accent-color);
+}
+
+/* === 定义列表样式（简历常用） === */
+.resume-page dl {
+  margin-bottom: 8px;
+}
+
+.resume-page dt {
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+  font-weight: 500;
+  color: var(--resume-primary-color);
+  margin-bottom: 4px;
+}
+
+.resume-page dd {
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+  line-height: var(--resume-line-height);
+  color: #333;
+  margin-left: 0;
+  margin-bottom: 4px;
+}
+
+/* === 代码样式 === */
+.resume-page code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: #555;
+}
+
+.resume-page pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 12px 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.resume-page pre code {
+  background: none;
+  padding: 0;
+}
+
+/* === 引用样式 === */
+.resume-page blockquote {
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+  line-height: var(--resume-line-height);
+  color: #666;
+  border-left: 3px solid var(--resume-accent-color);
+  padding-left: 16px;
+  margin: 8px 0;
+  font-style: italic;
+}
+
+/* === 表格样式 === */
+.resume-page table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+}
+
+.resume-page th,
+.resume-page td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  text-align: left;
+}
+
+.resume-page th {
+  font-weight: 500;
+  color: var(--resume-primary-color);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.resume-page tr:last-child td {
+  border-bottom: none;
+}
+
+/* === 分页符样式 === */
+.resume-page hr {
+  border: none;
+  height: 0;
+  margin: 0;
+  visibility: hidden;
+}
+
+.md-it-newpage {
+  display: none;
+}
+
+/* === 特殊简历元素 === */
+
+/* 时间标签 */
+.resume-page .time-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #888;
+  font-weight: 400;
+}
+
+/* 项目标题行 */
+.resume-page .project-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.resume-page .project-title h3 {
+  margin: 0;
+}
+
+/* 成果高亮 */
+.resume-page .highlight-result {
+  background: linear-gradient(90deg, rgba(201, 169, 98, 0.1) 0%, transparent 100%);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* === 打印优化 === */
+@media print {
+  .resume-page {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .resume-page h2 {
+    border-bottom-color: var(--resume-accent-color);
+  }
+
+  .resume-page a {
+    color: var(--resume-primary-color);
+    border-bottom: none;
+  }
+}
+
+/* === 动画效果 === */
+.resume-page {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === 响应式微调 === */
+@media screen and (max-width: 800px) {
+  .resume-header-items {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .resume-header-item:not(.no-separator)::after {
+    content: none;
+  }
+
+  .resume-page h2 {
+    font-size: 16px;
+  }
+
+  .resume-page h3 {
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────
+# pre-commit 钩子：防止把「被污染的数据」提交入库
+#
+# 防护两类真实事故：
+#   ① 污染路径被提交 —— 误装 skill 产生的 .agents/ .claude/ agent/ skills-lock.json
+#   ② 真实数据被示例内容覆盖后提交 —— profile.yml 变张三、弹药库变虚构项目
+#
+# 安装：python scripts/setup.py（或手动 cp 本文件到 .git/hooks/pre-commit 并 chmod +x）
+# 绕过：git commit --no-verify
+# ─────────────────────────────────────────────────────────────
+set -uo pipefail
+
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$ROOT" 2>/dev/null || exit 0
+
+STAGED="$(git diff --cached --name-only 2>/dev/null || true)"
+[ -z "$STAGED" ] && exit 0
+
+die() {
+  echo
+  echo "════ pre-commit 拦截 ════"
+  printf '%s\n' "$1"
+  echo
+  echo "如确认无误，用 git commit --no-verify 跳过。"
+  exit 1
+}
+
+# ① 已知污染路径（误装第三方 skill 的典型产物）
+POLLUTED="$(printf '%s\n' "$STAGED" | grep -E '^(\.agents|\.claude|agent)/|^skills-lock\.json$' || true)"
+if [ -n "$POLLUTED" ]; then
+  die "暂存区含疑似误装产生的污染路径：
+$POLLUTED"
+fi
+
+# ② 数据完整性：仅当数据文件被改动时校验（避免误拦未初始化的仓库或纯文档提交）
+DATA_FILES="$(printf '%s\n' "$STAGED" \
+  | grep -E '^(config/profile\.yml|references/(project-library|interview-story-bank|interview-question-bank)\.md|ENVIRONMENT\.md)$' \
+  || true)"
+if [ -n "$DATA_FILES" ]; then
+  PY="$(command -v python3 || command -v python || true)"
+  if [ -n "$PY" ] && [ -f "$ROOT/scripts/check-data.py" ]; then
+    if ! OUT="$("$PY" "$ROOT/scripts/check-data.py" 2>&1)"; then
+      die "数据校验未通过（真实数据可能已被示例内容覆盖）：
+$(printf '%s\n' "$OUT" | tail -8)"
+    fi
+  fi
+fi
+
+exit 0

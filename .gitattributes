@@ -1,0 +1,9 @@
+# 换行符规范
+*.bat text eol=crlf
+*.sh text eol=lf
+
+# git 钩子：由 git 自带的 bash 执行，必须 LF（CRLF 会让 shebang 失效）
+scripts/hooks/* text eol=lf
+
+# 第三方库：不做换行转换（保持分发原样，避免无意义的整文件 diff）
+editor/vendor/** -text
