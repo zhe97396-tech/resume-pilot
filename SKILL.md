@@ -1,6 +1,6 @@
 ---
 name: resume-pilot
-description: "简历定制化生成与面试准备技能。基于求职者真实经历素材（内置项目弹药库 references/project-library.md + 基础档案 config/profile.yml，可选补充个人简历）、目标公司名称及岗位JD，生成与岗位高度匹配的定制化简历与面试准备材料（均为 Markdown，可经本地编辑器预览/导出）。适用场景：个人求职、职业咨询、就业辅导、猎头候选人包装、校园求职指导。触发条件：当用户提供目标公司名称、岗位JD或链接或招聘要求或岗位说明（或补充简历文件/文本），或表达定制简历、优化简历、分析公司、准备面试、生成投递材料、简历匹配岗位等意图时调用。关键词：简历定制、简历优化、岗位匹配、面试准备、JD分析、求职、跳槽、投递材料。Resume customization and interview prep skill. Generates a tailored resume and interview preparation doc (both Markdown) from a real experience library, target company info, and job description."
+description: "简历定制化生成与面试准备技能。基于求职者真实经历素材（内置项目弹药库 references/project-library.md + 基础档案 config/profile.yml，可选补充个人简历）、目标公司名称及岗位JD，生成与岗位高度匹配的定制化简历与面试准备材料（均为 Markdown，可经本地编辑器预览/导出）。适用场景：个人求职、职业咨询、就业辅导、猎头候选人包装、校园求职指导。触发条件：当用户提供目标公司名称、岗位JD或链接或招聘要求或岗位说明（或补充简历文件/文本），或表达定制简历、优化简历、分析公司、准备面试、生成投递材料、简历匹配岗位、打开简历编辑器（可视化预览/换模板/导出）等意图时调用。关键词：简历定制、简历优化、岗位匹配、面试准备、JD分析、求职、跳槽、投递材料、简历编辑器、预览简历。Resume customization and interview prep skill. Generates a tailored resume and interview preparation doc (both Markdown) from a real experience library, target company info, and job description."
 agent_created: true
 ---
 
@@ -17,7 +17,7 @@ agent_created: true
 
 > 查看当前数据目录：`python scripts/check-data.py --where`｜多套数据/测试隔离：环境变量 `RESUME_PILOT_HOME`。
 
-> ⚠️ **未初始化时**（数据目录无 `config/profile.yml`）：AI 应先引导用户运行 `scripts/setup.py`，不得直接报错或编造数据。
+> ⚠️ **未初始化时**（数据目录无 `config/profile.yml`）：**先按 `references/getting-started.md` 做首次接触引导**——介绍能做什么 → 给三步开始 → 再执行 `scripts/setup.py`；不得直接报错或编造数据。
 > ⚠️ **仍为示例数据时**（profile.yml 为张三等）：提醒用户先替换（`generate_md.py` 已内置告警）。
 
 详见 `README.md`。
@@ -52,6 +52,7 @@ agent_created: true
 | 面试准备 | "帮我准备这个岗位的面试" | Phase 1 → 2 → 4（已有简历则复用，不重生） |
 | 投递材料（全流程） | "帮我准备投递材料" | Phase 1 → 2 → 2.5 → 3 → 5 → 4 |
 | 换/传简历照片 | "帮我换张照片/换头像"、"照片怎么传" + 图片或路径 | **先引导，再动手**：按 `ENVIRONMENT.md` 的照片小节向用户说清三条（只有一张 `config/photo.jpg`；三种换法任选；走 AI 这条路需要**图片文件路径**，对话里贴图读不到字节），拿到路径后执行 `python scripts/set_photo.py <路径>`（自动备份旧图、默认压到长边 900px）；**不跑简历流程**，且仅在用户明确要求时更换 |
+| 打开简历编辑器 | "打开编辑器"、"预览简历"、"换个模板/导出" | 按 `ENVIRONMENT.md`「启动简历编辑器」执行：agent 直接运行 skill 目录下的 `scripts/start_editor.py`（自动开浏览器）并把 URL 给用户；**不跑简历流程**，也不让用户去翻 skill 目录 |
 
 判定不了就问一句，不要默认跑全流程。已在早前话轮完成过的阶段直接复用结论，不重复执行。
 
@@ -160,7 +161,7 @@ agent_created: true
    python scripts/generate_md.py --data <resume.json> --company "<公司名>" --position "<岗位名>"
    ```
    输出到 `output/<公司>/<岗位>/resume.md`，同时在该目录保存 `resume.json`（便于后续重渲染）
-3. 向用户报告 md 完整路径；如需可视化编辑/换模板/导出，启动编辑器：双击根目录 `start-editor.bat` 或运行 `python scripts/start_editor.py`（自动开浏览器 http://localhost:3201/editor/），详见 `ENVIRONMENT.md`
+3. 向用户报告 md 完整路径；如需可视化编辑/换模板/导出，按 `ENVIRONMENT.md`「启动简历编辑器」执行（agent 运行 skill 目录下的 `scripts/start_editor.py`，自动开浏览器 http://localhost:3201/editor/），**不要把路径丢给用户让他自己找**
 
 ## 写作红线（不可违背，速查）
 
@@ -191,6 +192,8 @@ agent_created: true
 ## References
 
 > **路径约定**：`config/profile.yml`、`references/project-library.md`、`references/interview-story-bank.md`、`references/interview-question-bank.md`、`ENVIRONMENT.md` 是**用户数据文件**（在数据目录，见「首次使用」，不在本 skill 目录内）；其余均为方法论文档。
+
+**首次使用**：`getting-started.md`（**未初始化时的首次接触引导**：能力清单 / 三步开始 / 数据填写对照 / 首句话术）
 
 **数据文件**：`config/profile.yml`（基础档案：基本信息/职业阶段时间线铁律/项目分组 project_grouping/优势维度库/工具栈 tool_stack。简历骨架权威源，用户维护，AI 只读不写）｜`project-library.md`（项目弹药库：事实层素材，选材入口，先读索引再读详情）｜`interview-story-bank.md`（STAR+R 故事库）｜`interview-question-bank.md`（按岗位类型分层的问题库）
 

@@ -27,12 +27,16 @@
 
 ## 启动简历编辑器（可视化预览/编辑/导出）
 
-**Windows**：双击 `start-editor.bat`
-**macOS / Linux**：
-```bash
-./start-editor.sh
-```
-**通用命令行**：
+编辑器 = 本地服务 + 浏览器，跑起来就有 URL——**不需要知道 skill 装在哪**。
+
+**方式一：让 agent 启动（推荐）**
+- 直接说"打开简历编辑器"；或发带参数的 skill 命令：Pi 用 `/skill:resume-pilot 打开编辑器`，Claude Code 用 `/resume-pilot 打开编辑器`
+- agent 会执行 skill 目录下的 `scripts/start_editor.py`
+
+**方式二：自己启动**
+- **skill 安装方式**：双击数据目录里的启动器 `start-editor.bat`（macOS/Linux 用 `start-editor.sh`）——由 `setup.py` 生成，内含 skill 绝对路径；skill 位置变化后删掉它重跑 `setup.py`
+- **克隆为项目**：双击项目根目录的 `start-editor.bat`（macOS/Linux 用 `./start-editor.sh`）
+- **通用命令行**（cwd 需在 skill 目录）：
 ```bash
 python scripts/start_editor.py     # 扫描端口 → 启动服务 → 开浏览器（端口占用自动往后选）
 python scripts/server.py           # 仅启动服务（默认 3201），手动打开 http://localhost:3201/editor/

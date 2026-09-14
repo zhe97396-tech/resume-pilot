@@ -6,7 +6,8 @@
   1. 检查 Python 版本
   2. 检查并安装依赖（PyYAML）
   3. 从示例模板生成数据文件到数据根目录
-  4. 打印数据存放位置与下一步指引
+  4. 在数据目录生成编辑器启动器（双击即用）
+  5. 安装 git 钩子（仅 git 仓库）
 
 数据位置由 paths.py 统一决定（skill 安装 → ~/.resume-pilot/；克隆为项目 → 项目目录）。
 
@@ -21,10 +22,11 @@ from init_data import sync_data_files
 from paths import DATA_ROOT, IS_SKILL_INSTALL, SKILL_ROOT, describe
 
 MIN_PY = (3, 9)
+TOTAL_STEPS = 5
 
 
 def step(n, text):
-    print(f"\n[{n}/4] {text}")
+    print(f"\n[{n}/{TOTAL_STEPS}] {text}")
 
 
 def install_git_hook() -> str:
@@ -49,6 +51,71 @@ def install_git_hook() -> str:
     except OSError:
         pass
     return "installed"
+
+
+def write_launcher() -> list:
+    """在数据目录生成编辑器启动器（Windows .bat / POSIX .sh）。
+
+    启动器内写死 skill 的**绝对路径**，让用户不必知道 skill 装在哪；
+    数据目录是用户可见且稳定的位置，双击即可启动编辑器。
+    已存在则跳过——克隆方式下项目根已有仓库版启动器，不覆盖。
+    skill 位置变化后：删除该文件重跑本脚本即可刷新路径。
+    """
+    skill_root = str(SKILL_ROOT.resolve())
+    skill_root_posix = skill_root.replace("\\", "/")
+    results = []
+
+    bat = DATA_ROOT / "start-editor.bat"
+    if bat.exists():
+        results.append((bat, "exists"))
+    else:
+        # newline="" → 保留手写的 \r\n，避免 Python 再翻译成 \r\r\n
+        with bat.open("w", encoding="utf-8", newline="") as f:
+            f.write(
+                "@echo off\r\n"
+                "chcp 65001 >nul\r\n"
+                f'cd /d "{skill_root}"\r\n'
+                "echo ============================================\r\n"
+                "echo   Resume Editor\r\n"
+                "echo ============================================\r\n"
+                "where python >nul 2>nul\r\n"
+                "if errorlevel 1 (\r\n"
+                "  echo [ERROR] Python not found in PATH. Please install Python 3.\r\n"
+                "  pause\r\n"
+                "  exit /b 1\r\n"
+                ")\r\n"
+                "python scripts\\start_editor.py\r\n"
+                "echo.\r\n"
+                "echo Editor stopped. Press any key to close.\r\n"
+                "pause >nul\r\n"
+            )
+        results.append((bat, "created"))
+
+    sh = DATA_ROOT / "start-editor.sh"
+    if sh.exists():
+        results.append((sh, "exists"))
+    else:
+        # newline="\n" → 强制 LF（CRLF 会让 POSIX shell 把 \r 当命令的一部分）
+        # 路径用正斜杠：Windows 上也可能在 Git Bash 里执行
+        with sh.open("w", encoding="utf-8", newline="\n") as f:
+            f.write(
+                "#!/usr/bin/env bash\n"
+                "# resume-pilot 编辑器启动器（setup.py 生成；skill 位置变化后删掉本文件重跑 setup.py）\n"
+                "set -e\n"
+                f'cd "{skill_root_posix}"\n'
+                "# POSIX 上通常只有 python3，Windows 的 Git Bash 里通常只有 python\n"
+                "if command -v python3 >/dev/null 2>&1; then\n"
+                "  exec python3 scripts/start_editor.py\n"
+                "fi\n"
+                "exec python scripts/start_editor.py\n"
+            )
+        try:
+            sh.chmod(0o755)
+        except OSError:
+            pass
+        results.append((sh, "created"))
+
+    return results
 
 
 def main():
@@ -92,8 +159,16 @@ def main():
     print("数据存放位置：")
     print(describe())
 
-    # 4. 安装 git 钩子（仅 git 仓库）
-    step(4, "安装 git 钩子（防污染/防数据覆盖）")
+    # 4. 编辑器启动器
+    step(4, "生成编辑器启动器（数据目录内，双击即用）")
+    for path, status in write_launcher():
+        if status == "created":
+            print(f"  ✅ 已生成 {path}")
+        else:
+            print(f"  ⏭️  已存在，未覆盖 {path}")
+
+    # 5. 安装 git 钩子（仅 git 仓库）
+    step(5, "安装 git 钩子（防污染/防数据覆盖）")
     hook_result = install_git_hook()
     if hook_result == "installed":
         print("  ✅ 已安装 pre-commit 钩子（提交前自动校验数据完整性）")
@@ -105,17 +180,23 @@ def main():
         print("  ⚠️  未找到钩子源文件 scripts/hooks/pre-commit，跳过")
 
     print("\n" + "=" * 56)
-    print("  安装完成！下一步：")
+    print("  安装完成！它能为你做什么：")
     print("=" * 56)
+    print("  · 岗位适配分析  —— 「分析一下这个岗位适不适合我」+ 粘贴 JD")
+    print("  · 定制简历      —— 「根据这个 JD 定制简历」+ 公司名 + 粘贴 JD")
+    print("  · 优化已有简历  —— 「帮我改一下这份简历」+ 简历文本")
+    print("  · 面试准备      —— 「帮我准备这个岗位的面试」+ 粘贴 JD")
+    print("  · 换简历照片 / 打开可视化编辑器（一句话即可）")
+    print()
+    print("  下一步：")
     print(f"  1. 编辑 {DATA_ROOT / 'config' / 'profile.yml'}")
     print("       —— 填你的基本信息 / 职业经历 / 优势维度 / 工具栈")
     print(f"  2. 编辑 {DATA_ROOT / 'references' / 'project-library.md'}")
     print("       —— 填你的真实项目素材")
     print("  3. 对 AI 说：「帮我根据这个 JD 定制简历」+ 粘贴 JD")
-    print("  4.（可选）启动可视化编辑器：")
-    print("       Windows:      双击 start-editor.bat")
-    print("       macOS/Linux:  ./start-editor.sh")
-    print("       通用:         python scripts/start_editor.py")
+    print("  4.（可选）打开可视化编辑器（预览 / 换模板 / 导出）：")
+    print("       · 对 AI 说「打开简历编辑器」；或发命令 /skill:resume-pilot 打开编辑器")
+    print(f"       · 或双击数据目录里的启动器：{DATA_ROOT / 'start-editor.bat'}")
     print()
     print("  ⚠️ profile.yml 现在是示例内容（张三），务必替换为你的真实信息。")
     if IS_SKILL_INSTALL:
