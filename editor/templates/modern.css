@@ -26,7 +26,7 @@
 .resume-header {
   text-align: left;                        /* ← 对齐 */
   padding: 40px 50px 30px;
-  margin-bottom: 0;
+  margin-bottom: 16px;                          /* ← 原为 0，导致「求职意向」紧贴头部底线 */
   border-bottom: none;
   background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);  /* ← 渐变 */
 }
@@ -43,6 +43,7 @@
 .resume-header-items {
   font-family: 'PingFang SC', sans-serif;
   font-size: 13px;                         /* ← 联系方式字号 */
+  justify-content: flex-start;             /* ← 与姓名对齐一致（左）；不写则继承 _base 的 center → 错行 */
   color: var(--template-muted);
   margin-top: 8px;
 }
@@ -75,7 +76,7 @@
 /* ===== 正文 ===== */
 .resume-page p {
   font-family: 'PingFang SC', sans-serif;
-  font-size: 14px;                         /* ← 正文字号 */
+  font-size: var(--resume-font-size, 15px);  /* ← 正文字号：跟随工具栏设置（原写死 14px → 字号滑块失效） */
   line-height: var(--resume-line-height, 1.5);
   color: var(--template-text);
   margin-bottom: var(--resume-paragraph-spacing, 6px);

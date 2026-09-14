@@ -35,7 +35,7 @@
 }
 
 .resume-name {
-  font-size: 20px;
+  font-size: 28px;                 /* ← 姓名（原 20px，仅 1.33× 正文，层级过弱） */
   font-weight: bold;
   color: var(--template-primary);
   margin-bottom: 8px;

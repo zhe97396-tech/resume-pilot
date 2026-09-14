@@ -144,7 +144,11 @@ python scripts/setup.py
 | macOS / Linux | `./start-editor.sh` |
 | 通用 | `python scripts/start_editor.py` |
 
-自动打开 `http://localhost:3201/editor/`（端口被占自动往后选，也可 `--port 4000`）。支持实时预览、13 套样式模板、字体/边距/配色、显示/隐藏照片、换照片、导出 PDF 与长图。
+自动打开 `http://localhost:3201/editor/`（端口被占自动往后选，也可 `--port 4000`）。支持实时预览、9 套样式模板、字体/边距/配色、显示/隐藏照片、换照片、导出 PDF 与长图。
+
+工作经历与教育背景的条目行按「时间 · 岗位 · 公司（校名）」三列同行排版，**公司名与时间不折行、公司名右对齐**——公司名再长也不会被拆到第二行。
+
+选模板时把鼠标停在选项上可看**适用场景**（偏互联网 / 传统企业 / ATS / 高管咨询 等）；模板清单见 `editor/templates/manifest.json`，新增模板 = 加一条 + 加同名 `.css`。
 
 ---
 
@@ -173,6 +177,7 @@ python scripts/setup.py
 
 1. **声明项目分组**：在 `profile.yml` 的 `project_grouping` 里指定"哪些项目必保留、哪些按 JD 挑"，产出更稳定。
 2. **定制简历结构**：改 `profile.yml` 的 `resume_layout` 可调整模块顺序（如教育前置）、改标题（"核心优势"→"个人优势"）、删除模块；新增模块用 `extra_sections`（证书 / 获奖 / 作品集）。单份简历也可在 JSON 里用 `layout` 临时覆盖。
+   **编辑器右侧已有「模块顺序」面板**：▲▼ 调整后点「保存顺序」即可（会写该份 `resume.json` 的 `layout` 并**重新生成 `resume.md`**，旧 md 备份到 `output/_backup/`）。
 3. **面试后复盘**：把面试官问的问题发回给 agent，会沉淀进问题库，下次准备更准。
 
 ---
@@ -259,7 +264,7 @@ resume-pilot/
 │   ├── set_photo.py                  # 换照片（可压缩，旧图自动备份）
 │   ├── server.py / start_editor.py   # 编辑器本地服务与启动器
 │   └── hooks/pre-commit              # 防数据被示例内容覆盖
-└── editor/                           # 编辑器前端（13 套模板，依赖已本地化）
+└── editor/                           # 编辑器前端（9 套已启用模板，依赖已本地化）
 ```
 
 **数据目录**（方式 A：`~/.resume-pilot/`；方式 B：项目目录内）：

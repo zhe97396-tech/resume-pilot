@@ -42,10 +42,24 @@ const api = {
     }
   },
 
-  /** 列出样式模板 */
-  async getTemplates() {
+  /** 读取模块顺序（有效顺序 + 来源 + 可选项） */
+  async getLayout(company, position) {
     try {
-      const res = await fetch(`${API_BASE}/api/templates`);
+      const res = await fetch(`${API_BASE}/api/resume/${encodeURIComponent(company)}/${encodeURIComponent(position)}/layout`);
+      return await res.json();
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
+  },
+
+  /** 保存模块顺序（服务端会写 resume.json 的 layout，并重新生成 resume.md） */
+  async saveLayout(company, position, layout) {
+    try {
+      const res = await fetch(`${API_BASE}/api/resume/${encodeURIComponent(company)}/${encodeURIComponent(position)}/layout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ layout })
+      });
       return await res.json();
     } catch (e) {
       return { success: false, error: e.message };

@@ -65,6 +65,7 @@
 .resume-header-items {
   font-family: 'Georgia', serif;         /* 联系方式字体 */
   font-size: 13px;                       /* ← 联系方式字号 */
+  justify-content: flex-start;           /* ← 与姓名对齐一致（左）；不写则继承 _base 的 center → 错行 */
   color: var(--template-muted);          /* 联系方式颜色 */
   margin-top: 8px;
 }
@@ -76,7 +77,7 @@
 /* ===== 一级标题（工作经历、教育背景等） ===== */
 .resume-page h2 {
   font-family: 'Georgia', serif;
-  font-size: 14px;                       /* ← h2 字号 */
+  font-size: 16px;                       /* ← h2 字号（原 14px＝正文，字号层级塔陷） */
   font-weight: 800;                      /* h2 粗细 */
   color: var(--template-primary);        /* h2 文字色 */
   text-transform: uppercase;             /* 强制大写 */
@@ -120,7 +121,7 @@
 /* ===== 正文段落 ===== */
 .resume-page p {
   font-family: 'Georgia', 'Noto Serif SC', serif;
-  font-size: 14px;                       /* ← 正文字号 */
+  font-size: var(--resume-font-size, 15px);   /* ← 正文字号：跟随工具栏设置（原写死 14px → 字号滑块失效） */
   line-height: var(--resume-line-height, 1.5);  /* 行高（工具栏可调） */
   color: var(--template-text);
   margin-bottom: var(--resume-paragraph-spacing, 5px);  /* 段距（工具栏可调） */

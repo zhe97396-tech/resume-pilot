@@ -1,0 +1,178 @@
+/**
+ * kakuna.css — 居中紧凑
+ *
+ * 版式蒸馏自 reactive-resume/kakuna（MIT）
+ * https://github.com/reactive-resume/reactive-resume
+ *
+ * 识别特征：**姓名 / 联系方式 / 照片与分节标题全部居中**，分节带主色底线，间距紧凑。
+ * 骨架：单栏 + 条目头三列同行（features.itemHeader = "inline"）。
+ *
+ * 注：上游对该模板的描述写的是"magenta 左侧边框"，但其源码里并无左边框
+ *     （亦无 borderLeft 声明），故此处按**源码实际实现**蒸馏，不实现左边框。
+ *     主色沿用上游描述里的 magenta 系，保留其辨识度。
+ *
+ * === 快速调整指南 ===
+ * 主色调：     :root { --template-primary: #xxx; }   分节底线、列表符号、链接
+ * 姓名字号：   .resume-name { font-size: 27px; }
+ * 头部居中：   .resume-header { text-align: center; }   ← 改 left 可切左对齐
+ * 照片居中：   .resume-photo { float: none; margin: 0 auto 10px; }
+ * 分节对齐：   .resume-page h2 { text-align: center; }  ← 改 left 可切左对齐
+ * 章节间距：   .resume-page h2 { margin-top: 14px; }
+ */
+
+/* ===== 颜色变量 ===== */
+:root {
+  --template-primary: #9d174d;   /* 分节底线、列表符号、链接 */
+  --template-accent: #9d174d;    /* 强调色 */
+  --template-text: #1f2937;      /* 正文颜色 */
+  --template-muted: #4b5563;     /* 次要文字 */
+  --template-light: #9ca3af;     /* 更淡文字 */
+  --template-bg: #ffffff;        /* 页面底色 */
+  --template-border: #e5e7eb;    /* 备用分隔线 */
+}
+
+/* ===== 页面基底 ===== */
+.resume-page {
+  text-align: justify;
+}
+
+/* ===== 头部：整体居中（本款识别特征） ===== */
+.resume-header {
+  text-align: center;
+}
+
+.resume-header h1 {
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+/* 照片跟随头部居中（_base.css 默认 float: right，居中版式下需改回文档流） */
+.resume-photo {
+  float: none;
+  display: block;
+  margin: 0 auto 10px;
+  margin-top: 0;
+}
+
+.resume-name {
+  font-size: 27px;                 /* ← 姓名字号 */
+  font-weight: 700;
+  color: var(--template-text);
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.resume-header-items {
+  font-size: var(--resume-font-size, 15px);
+  color: var(--template-muted);
+  text-align: center;
+  margin-top: 6px;
+}
+
+.resume-header-item a {
+  color: var(--template-primary);
+}
+
+.resume-header-item:not(.no-separator)::after {
+  content: " · ";
+}
+
+.resume-header-item:last-child::after {
+  display: none;
+}
+
+/* ===== 分节标题：主色 + 居中 + 底线 ===== */
+.resume-page h1, .resume-page h2 {
+  font-weight: 700;
+  color: var(--template-primary);   /* ← 分节标题用主色 */
+}
+
+.resume-page h1 { font-size: 27px; }
+
+.resume-page h2 {
+  font-size: 16px;
+  text-align: center;               /* ← 分节标题居中 */
+  border-bottom: 1px solid var(--template-primary);   /* ← 主色底线 */
+  padding-bottom: 3px;
+  margin-top: 14px;                 /* ← 章节间距（本款偏紧凑） */
+  margin-bottom: 6px;
+  letter-spacing: 1.5px;
+}
+
+.resume-page h3 {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--template-muted);
+  margin-bottom: 5px;
+}
+
+/* ===== 条目头：三列同行（骨架见 _base.css） ===== */
+
+/* ===== 正文 ===== */
+.resume-page p {
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.3);
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+}
+
+/* ===== 列表（紧凑：条目间距压到最小） ===== */
+.resume-page ul, .resume-page ol {
+  padding-left: 1.4em;
+  margin: 0.1em 0;
+}
+
+.resume-page ul { list-style-type: square; }
+
+.resume-page ol { list-style-type: decimal; }
+
+.resume-page li {
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.3);
+  margin-bottom: 1px;
+}
+
+.resume-page li::marker {
+  color: var(--template-primary);
+}
+
+/* ===== 定义列表 ===== */
+.resume-page dl {
+  display: flex;
+  line-height: calc(var(--resume-line-height, 1.3) * 1.038);
+}
+
+.resume-page dl dt, .resume-page dl dd:not(:last-child) { flex: 1; }
+
+.resume-page dt { font-weight: 500; color: var(--template-muted); }
+
+.resume-page dd { color: var(--template-text); margin-left: 0; }
+
+/* ===== 强调 ===== */
+.resume-page strong { font-weight: 600; color: var(--template-primary); }
+
+.resume-page em { font-style: italic; color: var(--template-muted); }
+
+/* ===== 链接 ===== */
+.resume-page a { color: var(--template-primary); text-decoration: none; }
+
+.resume-page a:hover { text-decoration: underline; }
+
+/* ===== 代码 / 引用 ===== */
+.resume-page code {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 0.9em; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px;
+}
+
+.resume-page blockquote {
+  border-left: 3px solid var(--template-primary); padding-left: 16px;
+  margin: 8px 0; color: var(--template-muted);
+}
+
+/* ===== 打印 ===== */
+@media print {
+  .resume-page h2 { border-bottom-color: var(--template-primary); }
+  .resume-page li::marker { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

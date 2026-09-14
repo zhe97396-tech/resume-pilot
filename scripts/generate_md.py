@@ -43,19 +43,6 @@ def ensure_period(text: str) -> str:
     return text
 
 
-def display_width(text: str) -> int:
-    """显示宽度：中文=2，ASCII=1。"""
-    return sum(2 if ord(ch) > 0x7F else 1 for ch in text)
-
-
-def pad_fullwidth(text: str, target_width: int) -> str:
-    """用全角空格补齐到目标显示宽度。"""
-    padding = target_width - display_width(text)
-    if padding <= 0:
-        return text
-    return text + FWSP * ((padding + 1) // 2)
-
-
 # ── 渲染函数 ────────────────────────────────────────────────────────────
 
 def render_header(profile: dict, company: str, position: str) -> list:
@@ -216,6 +203,18 @@ def render_extra_section(section: dict) -> list:
 #   2) 字典：{id: "summary", title: "个人优势"}（可改标题）
 DEFAULT_LAYOUT = ["header", "summary", "work_experience", "project_experience", "education", "skills"]
 
+# 内置模块的默认标题。
+# 单一来源：渲染时用它做缺省标题，编辑器「模块顺序」面板也用它做显示名——
+# 否则两处各写一份中文名，改名时会不一致。
+SECTION_TITLES = {
+    "header": "基本信息",
+    "summary": "核心优势",
+    "work_experience": "工作经历",
+    "project_experience": "项目经历",
+    "education": "教育背景",
+    "skills": "专业技能",
+}
+
 # 这些模块渲染前插入分隔线（保持既有排版：教育前有分割线）
 SEP_BEFORE = {"education"}
 
@@ -264,21 +263,21 @@ def render_resume(data: dict, profile: dict, company: str, position: str) -> str
             lines.extend(render_header(profile, company, position))
         elif sec_id == "summary":
             if data.get("summary"):
-                lines.extend(render_dimensions(data["summary"], title or "核心优势"))
+                lines.extend(render_dimensions(data["summary"], title or SECTION_TITLES["summary"]))
         elif sec_id == "work_experience":
             if data.get("work_experience"):
                 lines.extend(render_work_experience(
                     data["work_experience"],
-                    title or "工作经历",
+                    title or SECTION_TITLES["work_experience"],
                     include_personal=bool(data.get("include_personal_project")),
                 ))
         elif sec_id == "project_experience":
             if data.get("project_experience"):
-                lines.extend(render_project_experience(data["project_experience"], title or "项目经历"))
+                lines.extend(render_project_experience(data["project_experience"], title or SECTION_TITLES["project_experience"]))
         elif sec_id == "education":
-            lines.extend(render_education(profile, title or "教育背景"))
+            lines.extend(render_education(profile, title or SECTION_TITLES["education"]))
         elif sec_id == "skills":
-            lines.extend(render_skills(profile, title or "专业技能"))
+            lines.extend(render_skills(profile, title or SECTION_TITLES["skills"]))
         elif sec_id in extra:
             lines.extend(render_extra_section(extra[sec_id]))
         # 未知 id 静默跳过（容错）

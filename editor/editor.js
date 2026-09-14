@@ -174,6 +174,8 @@ class MdEditor {
     if (this.toolbar) {
       this.toolbar.options.companyName = company;
       this.toolbar.options.position = position;
+      // 切换简历 → 重新读取该份的模块顺序（每份的 layout 可能不同）
+      this.toolbar.loadLayoutOrder();
     }
     window.history.replaceState(
       null, '',

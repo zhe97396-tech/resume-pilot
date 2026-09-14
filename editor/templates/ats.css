@@ -29,13 +29,13 @@
 .resume-header {
   text-align: center;              /* ← 对齐 */
   padding-bottom: 20px;
-  border-bottom: 2px solid var(--template-primary);
+  border-bottom: 1px solid var(--template-border);   /* ← 原为 2px solid var(--template-primary)：2px 深灰是整页唯一重色，抢焦点；改为与其 h2 底线同级的细淡线 */
   margin-bottom: 20px;
   background: transparent;
 }
 
 .resume-name {
-  font-size: 20px;
+  font-size: 28px;                 /* ← 姓名（原 20px，仅 1.33× 正文，头部“弱名+重线”失衡） */
   font-weight: 700;
   color: var(--template-primary);
   letter-spacing: 3px;
@@ -46,6 +46,12 @@
   font-size: 14px;
   color: var(--template-muted);
   margin-top: 4px;
+}
+
+/* 本款定位是「单列无装饰、纯文本结构，供机器解析优先」，故关掉联系方式图标
+   （图标由 preview.js 按内容识别后内联注入，见 _base.css 的 .resume-icon）。 */
+.resume-icon {
+  display: none;
 }
 
 /* h2：粗体 + 细底线 */

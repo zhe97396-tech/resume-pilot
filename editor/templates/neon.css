@@ -63,6 +63,7 @@
 .resume-header-items {
   font-family: 'Inter', sans-serif;
   font-size: 14px;                         /* ← 联系方式字号 */
+  justify-content: flex-start;             /* ← 与姓名对齐一致（左）；不写则继承 _base 的 center → 错行 */
   color: var(--template-muted);
   margin-top: 10px;
 }
@@ -72,7 +73,7 @@
 /* ===== 一级标题：青色发光 + 渐变分隔线 ===== */
 .resume-page h2 {
   font-family: 'Inter', sans-serif;
-  font-size: 14px;                         /* ← h2 字号 */
+  font-size: 16px;                         /* ← h2 字号（原 14px＝正文，字号层级塔陷） */
   font-weight: 800;
   color: var(--template-primary);
   text-shadow: 0 0 10px rgba(34, 211, 238, 0.25);  /* ← h2 发光 */
@@ -105,7 +106,7 @@
 /* ===== 正文 ===== */
 .resume-page p {
   font-family: 'Inter', 'Noto Sans SC', sans-serif;
-  font-size: 14px;                         /* ← 正文字号 */
+  font-size: var(--resume-font-size, 15px);  /* ← 正文字号：跟随工具栏设置（原写死 14px → 字号滑块失效） */
   line-height: var(--resume-line-height, 1.5);
   color: var(--template-muted);            /* 正文颜色 */
   margin-bottom: var(--resume-paragraph-spacing, 5px);

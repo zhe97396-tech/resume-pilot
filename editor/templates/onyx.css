@@ -1,0 +1,166 @@
+/**
+ * onyx.css — 头部横线
+ *
+ * 版式蒸馏自 reactive-resume/onyx（MIT）
+ * https://github.com/reactive-resume/reactive-resume
+ *
+ * 识别特征：**头部下方一条主色横线**，分节标题不带下划线（干净），章节间距宽松。
+ * 骨架：单栏 + 条目头三列同行（features.itemHeader = "inline"）。
+ *
+ * === 快速调整指南 ===
+ * 主色调：     :root { --template-primary: #xxx; }   头部横线、列表符号、链接
+ * 姓名字号：   .resume-name { font-size: 27px; }
+ * 头部横线：   .resume-header { border-bottom: 1px solid var(--template-primary); }
+ * 章节间距：   .resume-page h2 { margin-top: 18px; }
+ * 分节底线：   .resume-page h2 { border-bottom: 1px solid var(--template-border); }  ← 默认无线
+ * 正文字号：   .resume-page p { font-size: var(--resume-font-size, 15px); }
+ */
+
+/* ===== 颜色变量 ===== */
+:root {
+  --template-primary: #0e7490;   /* 头部横线、列表符号、链接 */
+  --template-accent: #0e7490;    /* 强调色 */
+  --template-text: #1f2937;      /* 正文、姓名、分节标题 */
+  --template-muted: #4b5563;     /* 次要文字 */
+  --template-light: #9ca3af;     /* 更淡文字 */
+  --template-bg: #ffffff;        /* 页面底色 */
+  --template-border: #e5e7eb;    /* 备用分隔线 */
+}
+
+/* ===== 页面基底 ===== */
+.resume-page {
+  text-align: justify;
+}
+
+/* ===== 头部：左对齐 + 主色横线（本款识别特征） ===== */
+.resume-header {
+  text-align: left;
+  border-bottom: 1px solid var(--template-primary);   /* ← 头部横线 */
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+}
+
+.resume-header h1 {
+  text-align: left;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.resume-name {
+  font-size: 27px;                 /* ← 姓名字号 */
+  font-weight: 700;
+  color: var(--template-text);
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.resume-header-items {
+  font-size: var(--resume-font-size, 15px);
+  color: var(--template-muted);
+  margin-top: 6px;
+}
+
+.resume-header-item a {
+  color: var(--template-primary);
+}
+
+.resume-header-item:not(.no-separator)::after {
+  content: " · ";
+}
+
+.resume-header-item:last-child::after {
+  display: none;
+}
+
+/* ===== 分节标题：无线、深色、粗体 ===== */
+/* 与头部横线形成"一条线在头、分节纯文字"的对比，是本款与其他模板的主要差异 */
+.resume-page h1, .resume-page h2 {
+  font-weight: 700;
+  color: var(--template-text);
+}
+
+.resume-page h1 { font-size: 27px; }
+
+.resume-page h2 {
+  font-size: 16px;
+  border-bottom: none;             /* ← 分节不加线（默认无线，可覆盖） */
+  padding-bottom: 0;
+  margin-top: 18px;                /* ← 章节间距（本款偏宽松） */
+  margin-bottom: 7px;
+  letter-spacing: 0.5px;
+}
+
+.resume-page h3 {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--template-muted);
+  margin-bottom: 5px;
+}
+
+/* ===== 条目头：三列同行（骨架见 _base.css） ===== */
+
+/* ===== 正文 ===== */
+.resume-page p {
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.3);
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+}
+
+/* ===== 列表 ===== */
+.resume-page ul, .resume-page ol {
+  padding-left: 1.5em;
+  margin: 0.2em 0;
+}
+
+.resume-page ul { list-style-type: disc; }
+
+.resume-page ol { list-style-type: decimal; }
+
+.resume-page li {
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.3);
+  margin-bottom: 2px;
+}
+
+.resume-page li::marker {
+  color: var(--template-primary);
+}
+
+/* ===== 定义列表 ===== */
+.resume-page dl {
+  display: flex;
+  line-height: calc(var(--resume-line-height, 1.3) * 1.038);
+}
+
+.resume-page dl dt, .resume-page dl dd:not(:last-child) { flex: 1; }
+
+.resume-page dt { font-weight: 500; color: var(--template-muted); }
+
+.resume-page dd { color: var(--template-text); margin-left: 0; }
+
+/* ===== 强调 ===== */
+.resume-page strong { font-weight: 600; color: var(--template-text); }
+
+.resume-page em { font-style: italic; color: var(--template-muted); }
+
+/* ===== 链接 ===== */
+.resume-page a { color: var(--template-primary); text-decoration: none; }
+
+.resume-page a:hover { text-decoration: underline; }
+
+/* ===== 代码 / 引用 ===== */
+.resume-page code {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 0.9em; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px;
+}
+
+.resume-page blockquote {
+  border-left: 3px solid var(--template-border); padding-left: 16px;
+  margin: 8px 0; color: var(--template-muted);
+}
+
+/* ===== 打印 ===== */
+@media print {
+  .resume-page li::marker { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

@@ -1,0 +1,91 @@
+{
+  "_readme": [
+    "模板清单：模板元数据的**单一事实源**。新增模板 = 在本文件加一条 + 在 templates/ 加同名 .css。",
+    "消费方：editor/preview.js（读 features 决定条目头骨架）、editor/toolbar.js（生成模板下拉框）。",
+    "features.itemHeader 取值：",
+    "  inline —— 条目头改为「三列同行」（时间 / 岗位 · 专业学历 / 公司 · 校名）。",
+    "            位置由 flex 决定、左右两槽 nowrap，不依赖全角空格撑位，任何长度都不折行。",
+    "            骨架样式在 templates/_base.css，各模板可按需覆盖。",
+    "  split  —— 条目头改为「两行两列」：第一行 公司 · 校名（左）+ 时间（右），第二行 岗位 · 专业学历（左）。",
+    "  none（不声明）—— 条目头不改造，Markdown 原样渲染（全角空格撑位，长名会折行）。",
+    "条目头由 Markdown 里的全角空格分隔行识别而来（见 scripts/generate_md.py 的 render_company_line / render_education），",
+    "识别规则在 editor/preview.js 的 resolveMetaRows()。",
+    "已下线（2026-09 模板盘点结论：客观缺陷或与保留项同质化）。**CSS 文件保留在 templates/ 下、未删**，如需恢复：把对应 .css 的条目加回本清单即可。下线名单：minimal / clean / ng / professional / card / gradient / meowth / onyx / kakuna。"
+  ],
+  "templates": [
+    {
+      "id": "official",
+      "name": "官方默认",
+      "description": "黑色单栏、微软雅黑、1px 分节底线；通用投递默认款",
+      "features": {
+        "itemHeader": "inline"
+      }
+    },
+    {
+      "id": "modern",
+      "name": "现代简约",
+      "description": "苹方 + 蓝色系 + 左对齐头部；偏互联网 / 通用岗",
+      "features": {
+        "itemHeader": "inline"
+      }
+    },
+    {
+      "id": "classic",
+      "name": "经典商务",
+      "description": "宋体 + 灰度配色 + 下划线链接；偏传统企业、金融、咨询",
+      "features": {
+        "itemHeader": "inline"
+      }
+    },
+    {
+      "id": "ats",
+      "name": "ATS 友好",
+      "description": "单列无装饰、纯文本结构；供机器解析优先的投递渠道",
+      "features": {
+        "itemHeader": "inline"
+      }
+    },
+    {
+      "id": "lapis",
+      "name": "简洁正式",
+      "description": "深蓝主色 + 红色强调；正式但带一点辨识度",
+      "features": {
+        "itemHeader": "inline"
+      }
+    },
+    {
+      "id": "neon",
+      "name": "暗黑霓虹",
+      "description": "暗色底 + 青色发光字；创意岗、作品集场景（唯一暗色款）",
+      "features": {
+        "itemHeader": "inline"
+      }
+    },
+    {
+      "id": "magazine",
+      "name": "杂志衬线",
+      "description": "Georgia 衬线 + 超大姓名；偏品牌、市场、内容岗",
+      "features": {
+        "itemHeader": "inline"
+      }
+    },
+    {
+      "id": "scizor",
+      "name": "线框分节",
+      "description": "单栏；每页顶部主色横线、章节顶部横线、分节标题大写加粗、姓名下方分隔线，条目头两行两列；偏高管、咨询、创业",
+      "source": "版式蒸馏自 reactive-resume/scizor（MIT）",
+      "features": {
+        "itemHeader": "split"
+      }
+    },
+    {
+      "id": "rhyhorn",
+      "name": "标题延长线",
+      "description": "单栏；分节标题右侧延伸一条细线直到内容右边界，纯黑白单色无彩色强调，头部左对齐 + 联系方式带图标 + 照片右上；通用 / 技术岗",
+      "source": "版式蒸馏自 reactive-resume/rhyhorn（MIT）",
+      "features": {
+        "itemHeader": "inline"
+      }
+    }
+  ]
+}

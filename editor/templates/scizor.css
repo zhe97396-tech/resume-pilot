@@ -1,0 +1,197 @@
+/**
+ * scizor.css — 线框分节
+ *
+ * 版式蒸馏自 reactive-resume/scizor（MIT）
+ * https://github.com/reactive-resume/reactive-resume
+ *
+ * 单栏；每页顶部一条主色横线、每个章节顶部一条分隔线、分节标题大写加粗、
+ * 姓名下方 72% 分隔线；**条目头两行两列**（公司 · 校名 + 时间 / 岗位）。
+ *
+ * 骨架依赖：manifest.json 的 features.itemHeader = "split"
+ *           DOM 由 editor/preview.js 的 resolveMetaRows() 生成
+ *
+ * === 快速调整指南 ===
+ * 主色调：     :root { --template-primary: #xxx; }   仅用于每页顶部横线、列表符号、链接
+ * 姓名字号：   .resume-name { font-size: 32px; }
+ * 姓名分隔线： .resume-name::after { width: 72%; }
+ * 页顶横线：   .resume-page::before { height: 3px; }
+ * 分节标题：   .resume-page h2 { text-transform: uppercase; font-size: 0.9em; }
+ */
+
+/* ===== 颜色变量 ===== */
+:root {
+  --template-primary: #1e3a5f;   /* 每页顶部横线、列表符号、链接、条目主名 */
+  --template-accent: #1e3a5f;    /* 强调色 */
+  --template-text: #1f2937;      /* 正文颜色、分节标题 */
+  --template-muted: #4b5563;     /* 次要文字 */
+  --template-light: #9ca3af;     /* 更淡文字 */
+  --template-bg: #ffffff;        /* 页面底色 */
+  --template-border: #cbd5e1;    /* 章节顶线、姓名分隔线 */
+}
+
+/* ===== 页面基底 ===== */
+.resume-page {
+  text-align: justify;
+  position: relative;              /* 供 ::before 定位（页顶横线） */
+}
+
+/* 每页顶部主色横线：用绝对定位伪元素，不占布局高度、不影响分页与打印 */
+.resume-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;                     /* ← 页顶横线粗细 */
+  background: var(--template-primary);
+}
+
+/* ===== 头部：左对齐姓名 + 72% 分隔线 ===== */
+.resume-header {
+  text-align: left;
+  border-bottom: none;   /* ← 显式去掉：不写则会从 _base.css 继承 .resume-header 的底部浅灰线，
+                            与本款的「页顶主色线 + 章节顶线 + 姓名下 72% 线」叠成四重线 */
+}
+
+.resume-header h1 {
+  text-align: left;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.resume-name {
+  font-size: 32px;                 /* ← 姓名字号（本款最大） */
+  font-weight: 700;
+  color: var(--template-text);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+/* 姓名下方分隔线（占 72% 宽，参考 scizor 的 headerNameRule） */
+.resume-name::after {
+  content: "";
+  display: block;
+  width: 72%;                      /* ← 分隔线宽度 */
+  border-bottom: 2px solid var(--template-border);
+  margin-top: 8px;
+}
+
+.resume-header-items {
+  font-size: var(--resume-font-size, 15px);
+  justify-content: flex-start;   /* ← 与姓名对齐一致（左）；不写则继承 _base 的 center → 错行 */
+  color: var(--template-muted);
+  margin-top: 6px;
+}
+
+.resume-header-item a {
+  color: var(--template-primary);
+}
+
+.resume-header-item:not(.no-separator)::after {
+  content: " · ";
+}
+
+.resume-header-item:last-child::after {
+  display: none;
+}
+
+/* ===== 章节：顶部横线 + 大写加粗标题 ===== */
+.resume-page h1, .resume-page h2 {
+  font-weight: 700;
+  color: var(--template-text);
+}
+
+.resume-page h1 { font-size: 32px; }
+
+.resume-page h2 {
+  font-size: 16px;                 /* ← 分节标题字号（略小于正文基准的 18px）
+                                      注：不能写 0.9em——em 按父元素算，会算出比正文还小的字号 */
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-top: 1px solid var(--template-border);   /* ← 章节顶部横线 */
+  padding-top: 8px;
+  margin-top: 12px;
+  margin-bottom: 7px;
+}
+
+.resume-page h3 {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--template-muted);
+  margin-bottom: 5px;
+}
+
+/* ===== 条目头：两行两列 ===== */
+/* 骨架（两行两列、右槽不折行）在 _base.css 里定义，本模板只加观感差异：
+   第一行的左槽是公司 / 校名，让它承担条目主标题的视觉角色。 */
+.resume-meta-row--split .resume-meta-line:first-child .resume-meta-leading {
+  font-weight: 600;
+  color: var(--template-primary);
+}
+
+/* ===== 正文 ===== */
+.resume-page p {
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.3);
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+}
+
+/* ===== 列表 ===== */
+.resume-page ul, .resume-page ol {
+  padding-left: 1.5em;
+  margin: 0.2em 0;
+}
+
+.resume-page ul { list-style-type: square; }
+
+.resume-page ol { list-style-type: decimal; }
+
+.resume-page li {
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.3);
+  margin-bottom: 2px;
+}
+
+.resume-page li::marker {
+  color: var(--template-primary);
+}
+
+/* ===== 定义列表 ===== */
+.resume-page dl {
+  display: flex;
+  line-height: calc(var(--resume-line-height, 1.3) * 1.038);
+}
+
+.resume-page dl dt, .resume-page dl dd:not(:last-child) { flex: 1; }
+
+.resume-page dt { font-weight: 500; color: var(--template-muted); }
+
+.resume-page dd { color: var(--template-text); margin-left: 0; }
+
+/* ===== 强调 ===== */
+.resume-page strong { font-weight: 600; color: var(--template-primary); }
+
+.resume-page em { font-style: italic; color: var(--template-muted); }
+
+/* ===== 链接 ===== */
+.resume-page a { color: var(--template-primary); text-decoration: none; }
+
+.resume-page a:hover { text-decoration: underline; }
+
+/* ===== 代码 / 引用 ===== */
+.resume-page code {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 0.9em; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px;
+}
+
+.resume-page blockquote {
+  border-left: 3px solid var(--template-border); padding-left: 16px;
+  margin: 8px 0; color: var(--template-muted);
+}
+
+/* ===== 打印 ===== */
+@media print {
+  .resume-page::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .resume-page li::marker { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

@@ -1,14 +1,269 @@
 /**
- * _base.css — 所有模板共享的结构骨架
+ * _base.css — 所有模板共享的结构骨架 + **简历默认排版**（单一来源）
  *
- * 只包含：
- * 1. 页面容器外观（纸张阴影、A4 尺寸）
- * 2. 分页布局（resume-pages）
- * 3. 打印分页（@page、break-before）
- * 4. 最小 reset（p/li/dl margin:0）
+ * 分两块：
+ *   A. 简历默认排版（2026-09 从 editor/styles.css 迁入）
+ *      —— 模板 CSS 未定义的属性，最终就是落到这里。改模板前先看这块。
+ *      层叠顺序：本文件全部内容都在模板 CSS **之前**（见 index.html 与
+ *      toolbar.applyTemplate()），所以模板永远能覆盖这里——这是有意的。
+ *   B. 结构骨架
+ *      —— 页面容器外观（纸张阴影、A4 尺寸）、分页布局、打印分页、最小 reset、
+ *         条目头骨架（.resume-meta-*，由 preview.js 的 resolveMetaRows 生成）。
  *
- * 排版规则（字体、字号、颜色、列表符号、间距）由各模板独立控制。
+ * 注意：此处**不要**写按视口宽度的媒体查询（原因见文件末尾与 styles.css 历史注释）。
  */
+
+/* ================================================================
+   A. 简历默认排版（原 editor/styles.css 全文）
+   ================================================================ */
+.resume-header {
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.resume-name {
+  font-family: var(--resume-font-family);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--resume-primary-color);
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+.resume-header-items {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #666;
+}
+.resume-header-item {
+  display: inline-flex;
+  align-items: center;
+}
+.resume-header-item:not(.no-separator)::after {
+  content: '·';
+  margin-left: 8px;
+  color: #999;
+}
+.resume-header-item:last-child::after {
+  display: none;
+}
+.resume-header-item a {
+  color: var(--resume-accent-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.resume-header-item a:hover {
+  color: var(--resume-primary-color);
+}
+.resume-page h2 {
+  font-family: var(--resume-font-family);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--resume-primary-color);
+  margin-top: 16px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--resume-accent-color);
+  letter-spacing: 1px;
+}
+.resume-page h2:first-child {
+  margin-top: 0;
+}
+.resume-page h3 {
+  font-family: var(--resume-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  color: #333;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+.resume-page h4 {
+  font-family: var(--resume-font-family);
+  font-size: 14px;
+  font-weight: 500;
+  color: #444;
+  margin-top: 8px;
+  margin-bottom: 6px;
+}
+.resume-page p {
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+  line-height: var(--resume-line-height);
+  color: #333;
+  margin-bottom: var(--resume-paragraph-spacing, 6px);
+  text-align: justify;
+}
+.resume-page ul,
+.resume-page ol {
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+  line-height: var(--resume-line-height);
+  color: #333;
+  margin-bottom: var(--resume-paragraph-spacing, 6px);
+  padding-left: 1.5em;
+  margin-top: 0.2em;
+}
+.resume-page ul {
+  list-style-type: circle;
+}
+.resume-page ol {
+  list-style-type: decimal;
+}
+.resume-page li {
+  margin-bottom: 2px;
+}
+.resume-page li::marker {
+  color: var(--resume-accent-color);
+}
+.resume-page strong {
+  font-weight: 600;
+  color: var(--resume-primary-color);
+}
+.resume-page em {
+  font-style: italic;
+  color: #555;
+}
+.resume-page a {
+  color: var(--resume-accent-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+.resume-page a:hover {
+  border-bottom-color: var(--resume-accent-color);
+}
+.resume-page dl {
+  margin-bottom: 8px;
+}
+.resume-page dt {
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+  font-weight: 500;
+  color: var(--resume-primary-color);
+  margin-bottom: 4px;
+}
+.resume-page dd {
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+  line-height: var(--resume-line-height);
+  color: #333;
+  margin-left: 0;
+  margin-bottom: 4px;
+}
+.resume-page code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: #555;
+}
+.resume-page pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 12px 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+.resume-page pre code {
+  background: none;
+  padding: 0;
+}
+.resume-page blockquote {
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+  line-height: var(--resume-line-height);
+  color: #666;
+  border-left: 3px solid var(--resume-accent-color);
+  padding-left: 16px;
+  margin: 8px 0;
+  font-style: italic;
+}
+.resume-page table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+  font-family: var(--resume-font-family);
+  font-size: var(--resume-font-size);
+}
+.resume-page th,
+.resume-page td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  text-align: left;
+}
+.resume-page th {
+  font-weight: 500;
+  color: var(--resume-primary-color);
+  background: rgba(0, 0, 0, 0.02);
+}
+.resume-page tr:last-child td {
+  border-bottom: none;
+}
+.resume-page hr {
+  border: none;
+  height: 0;
+  margin: 0;
+  visibility: hidden;
+}
+.md-it-newpage {
+  display: none;
+}
+.resume-page .time-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: #888;
+  font-weight: 400;
+}
+.resume-page .project-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.resume-page .project-title h3 {
+  margin: 0;
+}
+.resume-page .highlight-result {
+  background: linear-gradient(90deg, rgba(201, 169, 98, 0.1) 0%, transparent 100%);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+@media print {
+  .resume-page {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .resume-page h2 {
+    border-bottom-color: var(--resume-accent-color);
+  }
+
+  .resume-page a {
+    color: var(--resume-primary-color);
+    border-bottom: none;
+  }
+}
+.resume-page {
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 /* ================================================================
    页面结构
@@ -64,6 +319,211 @@
 
 .resume-page ol {
   list-style-type: decimal;
+}
+
+/* ================================================================
+   分节容器（.resume-section）
+
+   由 preview.js 的 wrapSections() 生成：每个 h2 开一个 <section class="resume-section"
+   data-section="<标题>">，把这一节的块包在一起。**默认没有任何样式**（section 本就是块盒子），
+   因此对现有模板观感零影响；它是留给模板的排版挂钩。
+
+   模板可以据此做：
+   · 分节卡片：   .resume-section { border: 1px solid …; border-radius: 6px; padding: 10px }   （注意分节跨页时每页各一个卡片）
+   · 部内多列：   .resume-section:has(.resume-skills) .resume-skills-chips { display: grid; grid-template-columns: 1fr 1fr }
+   · 分节内独立间距 / 背景色
+
+   定位建议：标题可被 layout 改写，故用**内容选择器**（:has(...)）比用
+   data-section="标题字符串" 更稳健。
+
+   .resume-section-mark 是每个分节内的不可见占位元素（由 wrapSections 插入）。
+   它的唯一作用：占住“首个子元素”的位置，使 h2 **不是** :first-child。
+   若没有它，模板里已有的 `.resume-page h2:first-child { margin-top: 0 }`
+   （在旧 DOM 里永不命中）会变成每节都命中，把所有分节上边距抹为 0。
+   分页器会把它当作 0 高度单位一并克隆，因此每页的分节片段都带它。
+   ================================================================ */
+.resume-section-mark {
+  display: none;
+}
+
+/* ================================================================
+   技能块（核心工具栈）
+
+   由 preview.js 的 resolveSkills() 生成：工具项排成「名称 + 等级点阵」的网格，
+   能力/认证保持文字行。等级写法约定见 preview.js，以及 config/profile.example.yml。
+   点阵用 var(--template-primary)，因此随各模板主色走。
+   想要“标签胶囊”（边框/底色）观感的模板，在本模板 .css 里给 .resume-skill
+   加 border / background / padding 即可。
+   ================================================================ */
+.resume-skills {
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+}
+
+.resume-skills-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+  margin-bottom: 4px;
+}
+
+.resume-skill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.3);
+}
+
+/* 保留原 Markdown 的「、」分隔感：去掉后，名称含空格的项（如 Claude Code）
+   会与后一项连成一片，读不出分界。用伪元素而不是写回文本，
+   以免影响 .md 的可读性与其它渲染器。 */
+.resume-skill:not(:last-child)::after {
+  content: '、';
+  margin-left: 1px;
+  opacity: 0.45;
+}
+
+.resume-skill-level {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.resume-skill-level i {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--template-primary);
+  opacity: 0.2;
+}
+
+.resume-skill-level i.on {
+  opacity: 0.85;
+}
+
+/* ================================================================
+   联系方式图标
+
+   由 preview.js 的 contactItemHtml() 按内容识别类型后内联注入 SVG
+   （class="resume-icon"）。用 currentColor + 描边，因此自动随各模板的配色走，
+   不需要逐模板定义图标；尺寸用 em，所以跟随字号设置缩放。
+   不想显示图标的模板（如 ATS 友好款）在各自的 .css 里写 .resume-icon { display: none }
+   或给 .resume-header-items 加 display:none 即可。
+   ================================================================ */
+.resume-icon {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  vertical-align: -0.12em;
+  margin-right: 0.3em;
+  opacity: 0.7;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ================================================================
+   头部的元信息行（如「求职意向」）
+
+   由 preview.js 的 absorbHeaderMeta() 收进 .resume-header，位于联系方式之后、
+   头部底线之前。这样它不再夹在「头部底线」与「分节标题底线」之间，也不再与
+   第一个分节标题挤在一起。
+   位置/对齐随各模板的 .resume-header（居中头部即居中，左对齐头部即左对齐），
+   字体大小与颜色沿用 .resume-page p / strong 的模板规则，这里只去掉段落底距，
+   使它不参与正文的段间距节奏。
+   ================================================================ */
+.resume-header-meta {
+  margin-top: 8px;
+}
+
+/* 用两段选择器提高优先级：模板 CSS 里常见的 .resume-page p { text-align: justify }
+   与本节选择器同级、但模板在 _base.css 之后 → 不提高优先级就会被它压掉。
+   必须要 inherit：否则单行 justify 视觉上等于左对齐，居中头部里的求职意向会与姓名不一致。 */
+.resume-page .resume-header-meta p {
+  margin-bottom: 0;
+  text-align: inherit;
+}
+
+/* ================================================================
+   条目头骨架（公司行 / 教育行）
+
+   由 editor/preview.js 的 resolveMetaRows() 生成，仅在模板清单
+   （templates/manifest.json）声明了 features.itemHeader 时出现。
+   本处只定**结构**：三槽的定位方式、继承字号与间距。
+   具体观感（字体族、颜色、粗体、底线）由各模板的 h2 / p / strong 规则负责。
+
+   为什么位置必须由 flex 定：generate_md.py 原本靠全角空格把
+   时间 / 岗位 / 公司 撑成一行，全角空格宽 = 1em = 字号；
+   A4 可用宽 704px 时该行自然宽约 707px，每次都会拆掉公司名最后一字。
+   ================================================================ */
+.resume-meta-row {
+  display: flex;
+  align-items: baseline;
+  column-gap: 0.75em;
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.3);
+  text-align: left;                /* 覆盖 .resume-page 的 justify，避免撑开列间距 */
+}
+
+.resume-meta-leading {
+  flex: 0 0 auto;
+  white-space: nowrap;             /* 时间 / 校名：完整显示，不折行 */
+}
+
+.resume-meta-middle {
+  flex: 1 1 auto;
+  min-width: 0;                    /* 允许压缩：极端长度时在列内换行，而非挤出右列 */
+  text-align: center;
+}
+
+.resume-meta-trailing {
+  flex: 0 0 auto;
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;             /* 关键：公司名永不折行 */
+}
+
+/* 教育行：首槽是校名，长度不一 → 中槽（专业 · 学历）的起点会跟着飘，
+   表现为「工程管理」两行左右不齐。给首槽定最小宽即可跨行对齐。
+   值取 10em：容得下常见校名（≤ 10 个汉字），且用 em 故随字号设置缩放；
+   超过该宽度的校名会使该行中槽右移（退化但不报错）。
+   坐标系：只作用于 inline 骨架，split 骨架是两行两列，无跨行对齐问题。 */
+.resume-meta-row--edu:not(.resume-meta-row--split) .resume-meta-leading {
+  min-width: 10em;
+}
+
+/* 两行两列变体（features.itemHeader = "split"）
+   第一行：公司 · 校名（左）+ 时间（右）；第二行：岗位 · 专业学历（左）
+   注：必须显式 align-items: stretch——纵向 flex 下 align-items 控制的是横向，
+       继承 .resume-meta-row 的 baseline 会退化为 flex-start，导致行不撑满宽度、
+       trailing 的 margin-left: auto 失效（右对齐丢失）。 */
+.resume-meta-row--split {
+  flex-direction: column;
+  align-items: stretch;
+  row-gap: 0.15em;
+}
+
+.resume-meta-line {
+  display: flex;
+  align-items: baseline;
+  column-gap: 0.75em;
+  text-align: left;
+}
+
+.resume-meta-line .resume-meta-leading {
+  flex: 0 1 auto;                  /* 单槽行不 stretch，避免被撑满整行 */
+  min-width: 0;
+}
+
+.resume-meta-line .resume-meta-trailing {
+  flex: 0 0 auto;
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
 }
 
 /* 媒体 */

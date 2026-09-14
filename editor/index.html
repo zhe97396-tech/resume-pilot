@@ -21,10 +21,69 @@
   <script src="/editor/vendor/dom-to-image-more.min.js"></script>
 
   <!-- 编辑器样式 -->
-  <link rel="stylesheet" href="/editor/styles.css">
+  <!-- 注：此处曾有一行指向 /editor/styles.css 的 <link>。该文件名为「编辑器样式」，
+       实际全是简历默认排版（编辑器 UI 样式在本文件的 <style> 里），已于 2026-09 整份
+       迁入 /editor/templates/_base.css 并删除，故不再引入。 -->
+
+  <!-- 简历基础样式（所有模板共享）+ 模板样式（动态切换）
+       两者必须放在 <head> 且按此顺序：_base.css 是共享 reset，模板 CSS 要能盖过它。
+       切换模板时 toolbar.applyTemplate() 会把新的模板 <link> 追加到 <head>，
+       因此 _base.css 必须在 <head> 里且在前——一旦挪回 <body>，
+       追加到 head 的模板样式就会排到它前面，_base 的 reset 反过来压过模板规则。 -->
+  <link rel="stylesheet" href="/editor/templates/_base.css">
+  <link id="template-style" rel="stylesheet" href="/editor/templates/official.css">
 
   <style>
-    /* === CSS 变量定义 === */
+    /* === 模块顺序面板 === */
+  .layout-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .layout-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-primary);
+  }
+
+  .layout-item-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .layout-move {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 10px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .layout-move:hover:not(:disabled) {
+    color: var(--text-primary);
+    border-color: var(--accent);
+  }
+
+  .layout-move:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  /* === CSS 变量定义 === */
     :root {
       /* 颜色系统 */
       --bg-editor: #1a1b1e;
@@ -879,6 +938,11 @@
       <div class="toolbar-section">
         <span class="toolbar-label">模板</span>
         <div class="select-wrapper">
+          <!-- 下列选项是“模板清单加载失败”时的静态兜底（见 editor/toolbar.js 的 loadTemplates）。
+               正常情况下本下拉框由 /editor/templates/manifest.json 重建（单一事实源），
+               包含中文名与适用场景悬浮提示。
+               注：声明了条目头骨架的模板（如三列同行 / 线框分节）依赖清单才能正确渲染，
+               因此不列入此兜底清单。 -->
           <select id="select-template" class="select" style="min-width: 90px;">
             <option value="official">官方默认</option>
             <option value="modern">现代简约</option>
@@ -1044,7 +1108,7 @@
             <div class="settings-section-title">颜色</div>
             <div class="settings-row">
               <span class="slider-label">主色</span>
-              <input type="color" id="color-primary" class="color-picker" value="#377bb5">
+              <input type="color" id="color-primary" class="color-picker" value="#000000">
               <div class="color-presets" id="primary-presets">
                 <div class="color-preset" data-color="#1a1a2e" style="background: #1a1a2e;"></div>
                 <div class="color-preset" data-color="#2c3e50" style="background: #2c3e50;"></div>
@@ -1054,7 +1118,7 @@
             </div>
             <div class="settings-row">
               <span class="slider-label">强调</span>
-              <input type="color" id="color-accent" class="color-picker" value="#377bb5">
+              <input type="color" id="color-accent" class="color-picker" value="#000000">
               <div class="color-presets" id="accent-presets">
                 <div class="color-preset" data-color="#c9a962" style="background: #c9a962;"></div>
                 <div class="color-preset" data-color="#e74c3c" style="background: #e74c3c;"></div>
@@ -1062,6 +1126,19 @@
                 <div class="color-preset" data-color="#27ae60" style="background: #27ae60;"></div>
               </div>
             </div>
+          </div>
+
+          <!-- 模块顺序（写 resume.json 的 layout，并重新生成 resume.md） -->
+          <div class="settings-section">
+            <div class="settings-section-title">模块顺序</div>
+            <div id="layout-list" class="layout-list"></div>
+            <div class="settings-row" style="gap:6px;margin-top:6px;">
+              <button id="btn-layout-save" class="btn btn-secondary" style="flex:1;"
+                      title="写入该简历 resume.json 的 layout，并重新生成 resume.md（旧 md 会备份到 output/_backup/）">保存顺序</button>
+              <button id="btn-layout-reset" class="btn btn-secondary" style="flex:1;"
+                      title="恢复为生成器的默认模块顺序（注意：只是填入默认顺序，仍需点“保存顺序”生效）">恢复默认</button>
+            </div>
+            <div id="layout-hint" style="font-size:11px;color:var(--text-muted);line-height:1.5;margin-top:6px;"></div>
           </div>
 
           <!-- 照片 -->
@@ -1106,10 +1183,11 @@
     </div>
   </div>
 
-  <!-- 简历基础样式（所有模板共享） -->
-  <link rel="stylesheet" href="/editor/templates/_base.css">
-  <!-- 模板样式（动态切换） -->
-  <link id="template-style" rel="stylesheet" href="/editor/templates/official.css">
+  <!-- 简历默认排版与模板样式只在 <head> 声明一处（见文件顶部）。
+       此处**切勿**再放 _base.css / #template-style 的 <link>：
+       id 重复会让 applyTemplate() 删到 head 里那份，而 body 里的恒存副本
+       在文档顺序上更靠后 → 永远压过新模板 CSS，表现为「切模板无效」。
+       （2026-09 曾因此短暂出现该故障，已修。） -->
 
   <!-- JS 模块 -->
   <script src="/editor/api.js"></script>

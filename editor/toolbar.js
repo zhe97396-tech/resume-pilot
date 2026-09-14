@@ -36,6 +36,12 @@ class Toolbar {
     this.suppressCssApply = false;  // 同步模板 CSS 到 CSS 编辑器时，抑制“自定义样式”即时生效
     this.fitMode = 'width';  // 预览适应模式：'width' | 'height' | null（手动缩放时置 null）
 
+    // 模板清单（templates/manifest.json）：id → 元数据（含 features.itemHeader 骨架声明）
+    // 未加载成功时保持空对象 → 所有模板一律不改造条目头（= 改造前的旧行为，fail-safe）
+    this.templates = {};
+    // 当前已应用到预览的条目头骨架。与目标模板声明的骨架不同时必须重渲染 Markdown
+    this.appliedItemHeader = undefined;
+
     // 样式配置（参考 Oh My CV 的 style store）
     // 参考：site/src/composables/stores/style.ts + site/src/composables/constant/variables/default.ts
     // 默认值对齐 Oh My CV DEFAULT_STYLES
@@ -72,6 +78,7 @@ class Toolbar {
   init() {
     this.initActions();
     this.initTemplate();
+    this.loadTemplates();   // 异步：读模板清单 → 重建模板下拉框；失败则保留 index.html 静态选项
     this.initTheme();
     this.initCssEditor();
     this.initFont();
@@ -81,6 +88,7 @@ class Toolbar {
     this.initPaper();
     this.initColors();
     this.initPhoto();
+    this.initLayoutOrder();
     this.initZoom();
     this.initEditorSync();
     this.initResizeHandles();
@@ -275,7 +283,10 @@ class Toolbar {
     this.previewContainer.innerHTML = '';
 
     const markdown = this.editor.getValue();
-    const html = this.renderer.render(markdown);
+    const html = this.renderer.render(markdown, {
+      itemHeader: this.getItemHeaderMode(),
+      order: this.layoutTitleOrder(),
+    });
     this.pager.render(html);
     this.updateWordCount();
   }
@@ -319,6 +330,255 @@ class Toolbar {
       this.styleConfig.template = e.target.value;
       this.applyTemplate();
     });
+  }
+
+  /**
+   * 加载模板清单（templates/manifest.json）
+   *
+   * 清单是模板元数据的单一事实源：模板名、适用场景描述、条目头骨架声明。
+   * 加载成功后用清单重建下拉框（中文名 + 适用场景悬浮提示），
+   * 并把 features.itemHeader 应用到预览渲染。
+   *
+   * fail-safe：清单取不到（文件缺失/损坏/离线）时不报错、不阻塞，
+   *           保留 index.html 里的静态兜底选项，条目头一律不改造。
+   */
+  async loadTemplates() {
+    try {
+      const res = await fetch('/editor/templates/manifest.json');
+      if (!res.ok) return;
+      const data = await res.json();
+      const list = Array.isArray(data.templates) ? data.templates : [];
+      if (!list.length) return;
+
+      const map = {};
+      list.forEach((t) => { if (t && t.id) map[t.id] = t; });
+      this.templates = map;
+      this.buildTemplateSelect(list);
+    } catch (e) {
+      // 静默降级：旧行为（不改造条目头）
+    }
+  }
+
+  /**
+   * 用模板清单重建模板下拉框
+   *
+   * 名称与适用场景来自清单，不再在 index.html 里硬编码（避免两处各存一份）。
+   * description / source 作为 option 的悬浮提示，缓解“只看名字选不准”。
+   */
+  buildTemplateSelect(list) {
+    const select = document.getElementById('select-template');
+    if (!select) return;
+
+    const current = this.styleConfig.template;
+    select.innerHTML = '';
+
+    list.forEach((t) => {
+      if (!t || !t.id) return;
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.name || t.id;
+      const hint = [t.description, t.source].filter(Boolean).join('\n');
+      if (hint) opt.title = hint;
+      select.appendChild(opt);
+    });
+
+    // 当前模板不在清单里（清单缺项或用户自加 CSS）时补入，避免当前选中态丢失
+    if (!select.querySelector('option[value="' + CSS.escape(current) + '"]')) {
+      const opt = document.createElement('option');
+      opt.value = current;
+      opt.textContent = current;
+      select.appendChild(opt);
+    }
+    select.value = current;
+  }
+
+  /**
+   * 当前模板声明的条目头骨架
+   * @returns {string|undefined} 'inline' | 'split' | undefined（未声明 = 不改造）
+   */
+  getItemHeaderMode() {
+    const tpl = this.templates[this.styleConfig.template];
+    const f = tpl && tpl.features;
+    return (f && f.itemHeader) || undefined;
+  }
+
+  /**
+   * 按新模板重绘预览
+   *
+   * 条目头骨架不同的模板，Markdown 渲染出的 HTML 结构也不同，必须重新渲染；
+   * 骨架相同（当前 13 套老模板全为此情况）则只需重算分页——与改造前行为一致。
+   */
+  rerenderForTemplate() {
+    const mode = this.getItemHeaderMode();
+    if (mode === this.appliedItemHeader) {
+      this.pager.recalculate();
+      return;
+    }
+    this.appliedItemHeader = mode;
+    this.renderPreview();
+  }
+
+  // === 模块顺序面板 ===
+  //
+  // 顺序的正式来源是 resume.json 的 layout（优先级：该份 JSON ＞ profile.yml 的
+  // resume_layout ＞ 生成器默认）。本面板只是编辑器，保存时由服务端写 JSON 并
+  // **重新生成 resume.md**——因为顺序最终要靠生成器生效，直接改 md 会在下次
+  // 生成时被覆盖。
+  initLayoutOrder() {
+    const list = document.getElementById('layout-list');
+    const btnSave = document.getElementById('btn-layout-save');
+    const btnReset = document.getElementById('btn-layout-reset');
+    if (!list) return;
+
+    // 上下移动（事件委派）
+    list.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-dir]');
+      if (!btn) return;
+      const from = this.layoutOrder.findIndex((it) => this.layoutIdOf(it) === btn.dataset.id);
+      const to = from + (btn.dataset.dir === 'up' ? -1 : 1);
+      if (from < 0 || to < 0 || to >= this.layoutOrder.length) return;
+      const moved = this.layoutOrder.splice(from, 1)[0];
+      this.layoutOrder.splice(to, 0, moved);
+      this.layoutDirty = true;
+      this.renderLayoutList();
+      this.updateLayoutHint();
+      // 即时重排简历预览：点箭头就应该看到简历跟着变，而不是等保存。
+      // （此时 md 还是旧顺序，保存时才由服务端重新生成）
+      this.renderPreview();
+    });
+
+    if (btnSave) btnSave.addEventListener('click', () => this.saveLayoutOrder());
+    if (btnReset) {
+      btnReset.addEventListener('click', () => {
+        if (!this.layoutDefault || !this.layoutDefault.length) return;
+        this.layoutOrder = this.layoutDefault.slice();
+        this.layoutDirty = true;
+        this.renderLayoutList();
+        this.updateLayoutHint();
+        this.renderPreview();
+      });
+    }
+  }
+
+  /** 取布局项的模块 id（项可能是字符串，也可能是 {id, title} 对象） */
+  layoutIdOf(item) {
+    return (item && typeof item === 'object') ? item.id : item;
+  }
+
+  /** 切换简历时重新读取该份的模块顺序 */
+  async loadLayoutOrder() {
+    const list = document.getElementById('layout-list');
+    const hint = document.getElementById('layout-hint');
+    if (!list) return;
+    const company = this.options.companyName;
+    const position = this.options.position;
+    this.layoutOrder = [];
+    this.layoutDefault = [];
+    this.layoutTitles = {};
+    if (!company || !position) {
+      list.innerHTML = '';
+      if (hint) hint.textContent = '';
+      return;
+    }
+
+    const res = await window.api.getLayout(company, position);
+    if (!res.success) {
+      list.innerHTML = '';
+      if (hint) hint.textContent = res.error || '无法读取模块顺序';
+      return;
+    }
+
+    this.layoutOrder = (res.layout || []).slice();
+    this.layoutDefault = (res.allowed || []).slice();
+    this.layoutSource = res.source;
+    (res.sections || []).forEach((s) => { this.layoutTitles[s.id] = s.title; });
+    this.layoutDirty = false;
+    this.renderLayoutList();
+    this.updateLayoutHint();
+    // 面板顺序就是当前 md 的顺序 → 重绘一次保证预览与面板一致
+    this.renderPreview();
+  }
+
+  /**
+   * 当前面板顺序对应的分节标题数组（传给渲染器做即时重排）
+   *
+   * 返回 undefined 的情况：面板数据还没加载（layoutOrder 为空）或拿不到标题映射
+   * → 渲染器就不会重排，预览保持 md 自身的顺序（与保存后的结果一致）。
+   */
+  layoutTitleOrder() {
+    if (!this.layoutOrder || !this.layoutOrder.length) return undefined;
+    const titles = this.layoutTitleOrderCache || null;
+    return this.layoutOrder.map((it) => {
+      const id = this.layoutIdOf(it);
+      return (this.layoutTitles && this.layoutTitles[id]) || id;
+    });
+  }
+
+  /** 更新面板下方那行提示（区分“已保存”与“未保存”） */
+  updateLayoutHint() {
+    const hint = document.getElementById('layout-hint');
+    if (!hint) return;
+    if (this.layoutDirty) {
+      hint.textContent = '⚠ 已调整但未保存：预览已按新顺序显示，点「保存顺序」才会写入文件并重新生成 resume.md。';
+      return;
+    }
+    const src = {
+      json: '当前顺序来自这份简历的 resume.json',
+      profile: '当前顺序来自 profile.yml 的 resume_layout',
+      default: '当前为生成器默认顺序',
+    }[this.layoutSource] || '';
+    hint.textContent = src + '。保存时会重新生成 resume.md（旧内容备份到 output/_backup/）。';
+  }
+
+  renderLayoutList() {
+    const list = document.getElementById('layout-list');
+    if (!list) return;
+    list.innerHTML = '';
+    const n = this.layoutOrder.length;
+    this.layoutOrder.forEach((item, i) => {
+      const id = this.layoutIdOf(item);
+      const row = document.createElement('div');
+      row.className = 'layout-item';
+      const name = document.createElement('span');
+      name.className = 'layout-item-name';
+      name.textContent = (this.layoutTitles && this.layoutTitles[id]) || id;
+      row.appendChild(name);
+      [['up', '▲', i === 0], ['down', '▼', i === n - 1]].forEach(([dir, txt, atEdge]) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'layout-move';
+        b.dataset.dir = dir;
+        b.dataset.id = id;
+        b.textContent = txt;
+        if (atEdge) b.disabled = true;
+        row.appendChild(b);
+      });
+      list.appendChild(row);
+    });
+  }
+
+  async saveLayoutOrder() {
+    const company = this.options.companyName;
+    const position = this.options.position;
+    if (!company || !position || !this.layoutOrder.length) return;
+
+    const res = await window.api.saveLayout(company, position, this.layoutOrder);
+    if (!res.success) {
+      this.showToast('保存失败：' + (res.error || '未知错误'));
+      return;
+    }
+    this.layoutDirty = false;
+    this.layoutSource = 'json';   // 保存后顺序已写入该份 JSON，来源随之变化（否则提示还写旧来源）
+
+    // 服务端已重新生成 md → 同步到编辑器并重绘预览（避免编辑器里还是旧顺序）
+    if (this.editor && typeof res.markdown === 'string') {
+      this.editor.setValue(res.markdown);
+      this.saved = true;
+    }
+    this.updateLayoutHint();
+    this.renderPreview();
+    this.updateStatus();
+    this.showToast('顺序已保存，简历已重新生成');
   }
 
   // === CSS 编辑器 ===
@@ -537,6 +797,13 @@ class Toolbar {
     const primaryInput = document.getElementById('color-primary');
     const accentInput = document.getElementById('color-accent');
 
+    // 初始化：把选择器同步为**实际生效**的颜色
+    // 不同步时，HTML 里写死的 value 会与 styleConfig 的默认色不一致
+    // （曾为 HTML #377bb5 / styleConfig #000000）→ 首屏显示蓝、实际渲染黑，
+    // 用户一动选择器颜色会「跳」一下。
+    if (primaryInput) primaryInput.value = this.styleConfig.primaryColor;
+    if (accentInput) accentInput.value = this.styleConfig.accentColor;
+
     if (primaryInput) {
       primaryInput.addEventListener('input', (e) => {
         this.styleConfig.primaryColor = e.target.value;
@@ -700,7 +967,7 @@ class Toolbar {
     root.style.setProperty('--resume-margin-left', `${margins.left}px`);
     root.style.setProperty('--resume-margin-right', `${margins.right}px`);
 
-    // 颜色（同时设置 resume 和 template 变量，兼容模板 CSS + styles.css）
+    // 颜色（同时设置 resume 和 template 变量，兼容模板 CSS + _base.css）
     root.style.setProperty('--resume-primary-color', this.styleConfig.primaryColor);
     root.style.setProperty('--resume-accent-color', this.styleConfig.accentColor);
     root.style.setProperty('--template-primary', this.styleConfig.primaryColor);
@@ -750,7 +1017,7 @@ class Toolbar {
       this.updateColorPresets('accent', this.styleConfig.accentColor);
 
       this.applyStyle();
-      this.pager.recalculate();
+      this.rerenderForTemplate();
 
       // CSS 页签已打开时同步为新模板的 CSS；
       // 否则在 CSS 编辑器里敲任意一个字符都会用旧模板的 CSS 覆盖预览
@@ -777,6 +1044,11 @@ class Toolbar {
       rollback.href = prevHref;
       document.head.appendChild(rollback);
     };
+    // 模板样式一律追加到 <head> 末尾。
+    // 顺序敏感：模板 CSS 必须排在 _base.css 之后才能盖过它的共享 reset
+    //（如 .resume-page p { margin: 0 }）。_base.css 因此在 <head> 内、本处追加之前
+    //（见 editor/index.html）；若把 _base.css 挪回 <body>，追加到 head 的模板样式
+    // 就会排到它前面，_base 反过来压过模板——表现为“切一次模板段距变 0、照片位置锁死”。
     document.head.appendChild(link);
   }
 

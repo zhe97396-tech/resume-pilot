@@ -33,8 +33,8 @@
 /* ===== 头部：居中 + 底部边框 ===== */
 .resume-header {
   text-align: center;              /* 居中 */
-  padding: 40px 60px 30px;
-  margin-bottom: 0;
+  padding: 0 60px 30px;            /* ← 上边距原为 40px；本款头部无底色块，不需要内部留白 */
+  margin-bottom: 16px;              /* ← 原为 0，导致「求职意向」紧贴头部底线 */
   border-bottom: 2px solid var(--template-border);
   background: transparent;
 }
@@ -81,7 +81,7 @@
 /* ===== 正文：宋体 ===== */
 .resume-page p {
   font-family: 'SimSun', serif;
-  font-size: 14px;                 /* ← 正文字号 */
+  font-size: var(--resume-font-size, 15px);  /* ← 正文字号：跟随工具栏设置（原写死 14px → 字号滑块失效） */
   line-height: var(--resume-line-height, 1.5);
   color: var(--template-text);
   margin-bottom: var(--resume-paragraph-spacing, 6px);

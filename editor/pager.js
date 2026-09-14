@@ -94,31 +94,67 @@ class SmartPager {
     const pages = document.createElement('div');
     pages.className = 'resume-pages';
 
+    // 展开成“分页单位”：顶层块仍是一个单位；分节（.resume-section）则**展开其子块**。
+    // 关键：分页粒度与改造前完全一致（仍是块级），所以单列排版的分页结果不变；
+    // 同时记住每个块属于哪个分节，翻页时在新页里**重建分节包裹**，
+    // 这样模板才能用 .resume-section 做卡片/部内多列，而长分节仍可跨页拆分。
+    const units = [];
+    const MARK = 'resume-section-mark';
+    Array.from(container.children).forEach((child) => {
+      if (child.classList.contains('resume-section')) {
+        // 跳过占位元素：它不作为分页单位，而是由下面在**每个新建包裹**里重新注入，
+        // 这样才能保证「同一分节跨页时，下一页的片段也带占位元素」——
+        // 否则若某页恰好以 h2 开头，该 h2 会成为 :first-child 而被模板的上边距规则误命中。
+        Array.from(child.children).forEach((sub) => {
+          if (!sub.classList.contains(MARK)) units.push({ node: sub, section: child });
+        });
+      } else {
+        units.push({ node: child, section: null });
+      }
+    });
+
     let currentPage = this.createPage();
     let accHeight = 0;
+    let curWrap = null;      // 当前页里正在填充的分节容器
+    let curSrc = null;       // 它对应的源分节（用于判断是否同节）
 
-    Array.from(container.children).forEach((child) => {
-      const childHeight = this.getElementHeight(child);
+    units.forEach(({ node, section }) => {
+      const childHeight = this.getElementHeight(node);
 
       // 超出页面高度或遇到分页符，创建新页
       // 参考：dom.ts 中的判断逻辑
       // 注意：分页符本身高度为 0，当页尚未累积内容时不应响应，
       //      否则首行/连续/末行的手动分页符会产生空白 A4 页
-      const isPageBreak = child.classList.contains('md-it-newpage');
+      const isPageBreak = node.classList.contains('md-it-newpage');
 
       if ((accHeight + childHeight > this.pageHeight && accHeight > 0) || (isPageBreak && accHeight > 0)) {
         pages.appendChild(currentPage);
         currentPage = this.createPage();
         accHeight = 0;
+        curWrap = null;      // 翻页 → 分节在新页重新开（同一分节跨页时是新包裹）
+        curSrc = null;
 
         // 分页符：添加到新页顶部作为视觉标记
         if (isPageBreak) {
-          currentPage.appendChild(child.cloneNode(true));
+          currentPage.appendChild(node.cloneNode(true));
           return;
         }
       }
 
-      currentPage.appendChild(child.cloneNode(true));
+      if (section) {
+        if (curSrc !== section) {
+          curWrap = section.cloneNode(false);   // 只拷分节本身（类名/属性），不带子节点
+          const mark = document.createElement('i');   // 每页片段开头都补一个占位元素
+          mark.className = MARK;
+          mark.setAttribute('aria-hidden', 'true');
+          curWrap.appendChild(mark);
+          curSrc = section;
+          currentPage.appendChild(curWrap);
+        }
+        curWrap.appendChild(node.cloneNode(true));
+      } else {
+        currentPage.appendChild(node.cloneNode(true));
+      }
       accHeight += childHeight;
     });
 

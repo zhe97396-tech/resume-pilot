@@ -1,0 +1,217 @@
+/**
+ * rhyhorn.css — 标题延长线
+ *
+ * 版式蒸馏自 reactive-resume/rhyhorn（MIT）
+ * https://github.com/reactive-resume/reactive-resume
+ *
+ * 识别特征：**分节标题右侧延伸一条细线直到内容右边界**；纯黑白单色、无彩色强调；
+ * 头部左对齐（姓名 + 定位语 + 带图标的联系方式），照片在右上竖长方形。
+ *
+ * 骨架：单栏 + 条目头三列同行（features.itemHeader = "inline"）。
+ *
+ * 与原版的差异（受数据模型限制，见 ENVIRONMENT.md）：
+ *   原版技能区是「图标 + 类别名 + 等级词 + 工具列表」的多列块，
+ *   我们只有一条工具栈 → 用 .resume-skills 的「名称 + 等级点阵」代替（见 _base.css）；
+ *   原版的章节内多列网格（技能 2 列 / Online Presence 3 列）未复现。
+ *
+ * === 快速调整指南 ===
+ * 延长线颜色： .resume-page h2::after { border-top-color: #xxx; }
+ * 延长线起点： .resume-page h2 { gap: .6em; }        ← 标题与线之间的间距
+ * 姓名字号：   .resume-name { font-size: 20px; }
+ * 主色调：     :root { --template-primary: #xxx; }
+ * 页面顶线：   .resume-page { border-top: none; }     ← 默认无，可加
+ */
+
+/* ===== 颜色变量（本款黑白单色，无彩色强调）===== */
+:root {
+  --template-primary: #111827;   /* 姓名、分节标题、粗体、等级点阵 */
+  --template-accent: #111827;    /* 强调色（本款与主色相同） */
+  --template-text: #1f2937;      /* 正文颜色 */
+  --template-muted: #6b7280;     /* 次要文字（联系方式） */
+  --template-light: #9ca3af;     /* 更淡文字 */
+  --template-bg: #ffffff;        /* 页面底色 */
+  --template-border: #d1d5db;    /* 分节标题延长线 */
+}
+
+/* ===== 页面基底 ===== */
+.resume-page {
+  text-align: justify;
+}
+
+/* ===== 头部：左对齐 + 照片右上 ===== */
+.resume-header {
+  text-align: left;
+  border-bottom: 1px solid var(--template-border);   /* 头部下方一条通栏细线（同原版） */
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+
+.resume-header h1 {
+  text-align: left;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.resume-name {
+  font-size: 20px;                 /* ← 姓名字号（原版姓名不大，靠延长线撑结构） */
+  font-weight: 700;
+  color: var(--template-primary);
+  margin-bottom: 4px;
+}
+
+/* 原版照片比默认更大、更竖长 */
+.resume-photo {
+  width: 20mm;
+  height: 26mm;
+  border-radius: 2px;
+}
+
+.resume-header-items {
+  font-size: var(--resume-font-size, 15px);
+  color: var(--template-muted);
+  margin-top: 8px;
+}
+
+.resume-header-item a {
+  color: var(--template-muted);
+  text-decoration: none;
+}
+
+.resume-header-item:not(.no-separator)::after {
+  content: " | ";                  /* 原版联系方式用竖线分隔 */
+  margin-left: 0.3em;
+  opacity: 0.5;
+}
+
+.resume-header-item:last-child::after {
+  display: none;
+}
+
+/* 头部的元信息行（求职意向）：本款紧随联系方式，灰字 */
+.resume-header-meta {
+  margin-top: 6px;
+  color: var(--template-muted);
+}
+
+/* ===== 分节标题：右侧延伸细线（本款识别特征）===== */
+.resume-page h1, .resume-page h2 {
+  font-weight: 700;
+  color: var(--template-primary);
+}
+
+.resume-page h1 { font-size: 20px; }
+
+.resume-page h2 {
+  /* 改为 flex 行：标题文字是一个匿名 flex 项，::after 是另一个，自动填满右侧余量。
+     这样「文字 + 延长线」始终占满整行宽度，且线从文字右侧开始。 */
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 16px;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  letter-spacing: 0;
+}
+
+.resume-page h2::after {
+  content: "";
+  flex: 1;                         /* ← 吃掉剩余宽度，即成「延长线」 */
+  border-top: 1px solid var(--template-border);
+  min-width: 2em;                  /* 标题很长时仍留一小段线，避免完全消失 */
+}
+
+.resume-page h3 {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--template-text);
+  margin-bottom: 4px;
+}
+
+/* ===== 条目头：三列同行（骨架见 _base.css） ===== */
+
+/* ===== 正文 ===== */
+.resume-page p {
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.4);
+  color: var(--template-text);
+  margin-bottom: var(--resume-paragraph-spacing, 5px);
+}
+
+/* ===== 列表 ===== */
+.resume-page ul, .resume-page ol {
+  padding-left: 1.5em;
+  margin: 0.2em 0;
+}
+
+.resume-page ul { list-style-type: square; }
+
+.resume-page ol { list-style-type: decimal; }
+
+.resume-page li {
+  font-size: var(--resume-font-size, 15px);
+  line-height: var(--resume-line-height, 1.4);
+  margin-bottom: 2px;
+}
+
+.resume-page li::marker {
+  color: var(--template-primary);
+}
+
+/* ===== 技能等级点阵（原版为多列技能块，本款用点阵代替）===== */
+.resume-skill-level i {
+  background: var(--template-primary);
+}
+
+/* ===== 部内多列：技能排两列（与原版一致）=====
+   分节容器由 preview.js 的 wrapSections() 生成，见 _base.css。
+   用 :has(.resume-skills) 定位而不是 data-section="专业技能"——标题可被
+   layout 改写，内容选择器不会因此失效。 */
+.resume-section:has(.resume-skills) .resume-skills-chips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+/* 网格排列下，末列的「、」会变成行尾多余符号 → 去掉，改用列间距区分 */
+.resume-section:has(.resume-skills) .resume-skill::after {
+  content: none;
+}
+
+/* ===== 定义列表 ===== */
+.resume-page dl {
+  display: flex;
+  line-height: calc(var(--resume-line-height, 1.4) * 1.038);
+}
+
+.resume-page dl dt, .resume-page dl dd:not(:last-child) { flex: 1; }
+
+.resume-page dt { font-weight: 500; color: var(--template-muted); }
+
+.resume-page dd { color: var(--template-text); margin-left: 0; }
+
+/* ===== 强调 ===== */
+.resume-page strong { font-weight: 600; color: var(--template-primary); }
+
+.resume-page em { font-style: italic; color: var(--template-muted); }
+
+/* ===== 链接 ===== */
+.resume-page a { color: var(--template-primary); text-decoration: none; }
+
+.resume-page a:hover { text-decoration: underline; }
+
+/* ===== 代码 / 引用 ===== */
+.resume-page code {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 0.9em; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px;
+}
+
+.resume-page blockquote {
+  border-left: 3px solid var(--template-border); padding-left: 16px;
+  margin: 8px 0; color: var(--template-muted);
+}
+
+/* ===== 打印 ===== */
+@media print {
+  .resume-page h2::after { border-top-color: var(--template-border); }
+  .resume-page li::marker { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

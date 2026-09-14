@@ -10,7 +10,10 @@
   - POST /api/resume/<company>/<position>  保存某份简历 md
   - GET  /api/photo                        读取简历照片（config/photo.jpg，带 ETag/304）
   - POST /api/photo                        换照片：直接替换 config/photo.jpg（旧图备份）
-  - GET  /api/templates                    列出样式模板
+  - GET  /api/resume/<公司>/<岗位>/layout   读取模块顺序（有效顺序 + 来源 + 可选项）
+  - POST /api/resume/<公司>/<岗位>/layout   保存模块顺序（写 resume.json 的 layout，并重新生成 resume.md）
+  （无 /api/templates：模板清单的唯一来源是 editor/templates/manifest.json，
+    由前端直接读取；此处曾有一个只返回文件名做名称的平行实现，已删）
 
 启动：python scripts/server.py  → 浏览器打开 http://localhost:3201/editor/
 零第三方依赖（Python 标准库）。
@@ -86,6 +89,92 @@ def resolve_resume(company, position):
     except ValueError:
         return None
     return path
+
+
+# ══════════════════════════════════════════════════════════════
+# 模块顺序（layout）
+#
+# 顺序的**单一事实源**是 resume.json 的 layout；优先级：
+#   该份 JSON 的 layout ＞ profile.yml 的 resume_layout ＞ DEFAULT_LAYOUT
+# 本处**不重写**这套逻辑，而是直接复用 generate_md 的同名函数——
+# 否则服务端与生成器会出现两份“什么算有效顺序”的实现，迟早不一致。
+# ══════════════════════════════════════════════════════════════
+
+def _load_generator():
+    """延迟导入 generate_md。
+
+    它依赖 pyyaml，而本服务本体是零第三方依赖的（只用标准库）。
+    所以改为按需导入：服务启动不需要 yaml，只有用“模块顺序”功能才需要。
+    返回 (module, None) 或 (None, 错误信息)。
+    """
+    try:
+        import generate_md  # noqa: PLC0415 （有意延迟导入）
+        return generate_md, None
+    except ImportError as exc:  # pragma: no cover - 取决于环境
+        return None, f"无法读取模块顺序：缺少依赖 pyyaml（pip install pyyaml）。原始错误：{exc}"
+
+
+def read_layout_state(company, position):
+    """读取模块顺序状态。返回 (state, None) 或 (None, 错误信息)。"""
+    gen, err = _load_generator()
+    if err:
+        return None, err
+
+    md_path = resolve_resume(company, position)
+    if md_path is None:
+        return None, "非法路径"
+    json_path = md_path.with_name("resume.json")
+    if not json_path.exists():
+        return None, "该简历没有 resume.json，无法调整顺序（请先用技能生成简历）"
+    try:
+        data = json.loads(json_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return None, f"resume.json 不是合法 JSON：{exc}"
+
+    profile = {}
+    if gen.PROFILE_PATH.exists():
+        try:
+            import yaml  # noqa: PLC0415
+            profile = yaml.safe_load(gen.PROFILE_PATH.read_text(encoding="utf-8")) or {}
+        except Exception as exc:  # noqa: BLE001
+            return None, f"读取 profile.yml 失败：{exc}"
+
+    layout = gen._resolve_layout(data, profile)
+    if data.get("layout"):
+        source = "json"
+    elif profile.get("resume_layout"):
+        source = "profile"
+    else:
+        source = "default"
+
+    extra_titles = [
+        s.get("title") for s in (data.get("extra_sections") or [])
+        if isinstance(s, dict) and s.get("title")
+    ]
+    # 可选项：生成器认识的内置模块 + 该份简历的自定义模块（自定义模块以“标题”作为 id）
+    allowed = list(dict.fromkeys(list(gen.DEFAULT_LAYOUT) + extra_titles))
+
+    titles = {}
+    # 用户自定义标题（layout 里的 {id, title}）优先
+    for item in layout:
+        sec_id, title, _sep = gen._normalize_section(item)
+        if title:
+            titles[sec_id] = title
+    # 其余用生成器的内置默认中文标题（单一来源：generate_md.SECTION_TITLES），最后回退到 id
+    for i in allowed:
+        titles.setdefault(i, gen.SECTION_TITLES.get(i, i))
+
+    return {
+        "gen": gen,
+        "data": data,
+        "profile": profile,
+        "md_path": md_path,
+        "json_path": json_path,
+        "layout": layout,
+        "source": source,
+        "allowed": allowed,
+        "sections": [{"id": i, "title": titles.get(i, i)} for i in allowed],
+    }, None
 
 
 class QuietHTTPServer(ThreadingHTTPServer):
@@ -193,19 +282,23 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/api/resumes":
             return self._send_json({"success": True, "resumes": list_resumes()})
 
-        if path == "/api/templates":
-            tdir = EDITOR_DIR / "templates"
-            templates = []
-            if tdir.exists():
-                for f in sorted(tdir.glob("*.css")):
-                    if f.name.startswith("_"):
-                        continue
-                    templates.append({
-                        "id": f.stem,
-                        "name": f.stem,
-                        "url": f"/editor/templates/{f.name}",
-                    })
-            return self._send_json({"success": True, "templates": templates})
+        # 模块顺序：/api/resume/<公司>/<岗位>/layout（在通用简历读取之前先拦）
+        if path.startswith("/api/resume/") and path.endswith("/layout"):
+            parts = path[len("/api/resume/"):].split("/")
+            if len(parts) != 3:
+                return self._send_json(
+                    {"success": False, "error": "路径格式应为 /api/resume/<公司>/<岗位>/layout"}, 400
+                )
+            state, err = read_layout_state(parts[0], parts[1])
+            if err:
+                return self._send_json({"success": False, "error": err}, 404 if "没有 resume.json" in err else 400)
+            return self._send_json({
+                "success": True,
+                "layout": state["layout"],
+                "source": state["source"],
+                "allowed": state["allowed"],
+                "sections": state["sections"],
+            })
 
         if path.startswith("/api/resume/"):
             parts = path[len("/api/resume/"):].split("/")
@@ -305,6 +398,58 @@ class Handler(SimpleHTTPRequestHandler):
             tmp.write_bytes(data)
             os.replace(tmp, PHOTO_PATH)   # 原子替换，避免留下半截文件
             return self._send_json({"success": True, "message": "照片已替换", "backup": backup_rel})
+
+        # 模块顺序：保存并重新生成
+        if path.startswith("/api/resume/") and path.endswith("/layout"):
+            parts = path[len("/api/resume/"):].split("/")
+            if len(parts) != 3:
+                return self._send_json(
+                    {"success": False, "error": "路径格式应为 /api/resume/<公司>/<岗位>/layout"}, 400
+                )
+            state, err = read_layout_state(parts[0], parts[1])
+            if err:
+                return self._send_json({"success": False, "error": err}, 404 if "没有 resume.json" in err else 400)
+            try:
+                raw = self._read_body(limit=self.MAX_UPLOAD_BYTES)
+                if raw is None:
+                    return self._send_json({"success": False, "error": "内容过大"}, 413)
+                payload = json.loads(raw or "{}")
+            except json.JSONDecodeError:
+                return self._send_json({"success": False, "error": "请求体不是合法 JSON"}, 400)
+
+            layout = payload.get("layout")
+            if not isinstance(layout, list) or not layout:
+                return self._send_json({"success": False, "error": "缺少 layout（应为非空数组）"}, 400)
+            ids = [(it.get("id") if isinstance(it, dict) else it) for it in layout]
+            unknown = [i for i in ids if not isinstance(i, str) or i not in set(state["allowed"])]
+            if unknown:
+                return self._send_json({"success": False, "error": f"未知模块：{unknown}"}, 400)
+            if len(ids) != len(set(ids)):
+                return self._send_json({"success": False, "error": "同一模块不可重复出现"}, 400)
+
+            data = state["data"]
+            data["layout"] = layout
+            state["json_path"].write_text(
+                json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+
+            # 重新生成会覆盖 resume.md，所以先把旧内容备份（用户可能手工改过 md）
+            backup_rel = None
+            if state["md_path"].exists():
+                BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+                prev = BACKUP_DIR / f"{parts[0]}-{parts[1]}-resume.prev.md"
+                shutil.copy2(state["md_path"], prev)
+                backup_rel = str(prev.relative_to(DATA_ROOT))
+
+            md = state["gen"].render_resume(data, state["profile"], parts[0], parts[1])
+            state["md_path"].write_text(md, encoding="utf-8")
+            return self._send_json({
+                "success": True,
+                "message": "顺序已保存，简历已重新生成",
+                "layout": layout,
+                "markdown": md,
+                "backup": backup_rel,
+            })
 
         if path.startswith("/api/resume/"):
             parts = path[len("/api/resume/"):].split("/")
